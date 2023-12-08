@@ -1,0 +1,25 @@
+{% extends 'part/base.html' %}
+
+{% block content %}
+    <div class="container mt-15 mb-15">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="text-center mb-4">Verify OTP</h2>
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="otp">Enter OTP:</label>
+                                <input type="text" id="otp" name="otp" class="form-control" required>
+                            </div>
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary">Verify OTP</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

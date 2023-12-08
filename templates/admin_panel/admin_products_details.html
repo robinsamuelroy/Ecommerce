@@ -1,0 +1,231 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+{% block title %} Product Details {% endblock %}
+{% block  body %}
+
+<section class="content-main">
+    <div class="row">
+        <div class="col-9">
+            <div class="content-header">
+                <h2 class="content-title">Edit Product</h2>
+                <div>
+                    
+                   
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Product Details</h4>
+                </div>
+                <!-- {{form.errors}} -->
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="mb-4">
+                                    <label for="{{form.title.id_for_label}}" class="form-label">Product name</label>
+                                    <div class="row gx-2">
+                                        {{form.title}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="mb-4">
+                                    <label for="{{form.sku.id_for_label}}" class="form-label">SKU_id / Model number </label>
+                                    {{form.sku}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="mb-4">
+                                    <label for="{{form.category.id_for_label}}" class="form-label">Category </label>
+                                    {{form.category}}
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="mb-4">
+                                    <label for="{{form.stock_count.id_for_label}}" class="form-label">Stock Count </label>
+                                    {{form.stock_count}}
+                                    {{ form.stock_count.errors }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="{{form.product_description.id_for_label}}" class="form-label">Description</label>
+                            {{form.description}}
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="mb-4">
+                                    <label for="{{ form.old_price.id_for_label }}" class="form-label">Max price</label>
+                                    <div class="row gx-2">
+                                        {{form.old_price}}
+                                        {{form.old_price.errors}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="mb-4">
+                                    <label for="{{form.price.id_for_label}}" class="form-label">Sale price</label>
+                                    {{form.price}}
+                                    {{form.price.errors}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="mb-4">
+                                    {% if product.image %}
+                                            <img src="{{ product.image.url }}" class="img-sm img-thumbnail" alt="">
+                                            {% else %}
+                                            <p>No image available</p>
+                                            {% endif %}
+                                </div>
+
+                                <!-- try -->
+                                <div class="card-header">
+                                    <h4>Additional Images</h4>
+                                </div>
+                                <div class="card-body">
+                                    {% for i in product_images %}
+                                        <div class="input-upload">
+                                            <label for="product_image{{ i.id }}">Product Images </label>
+                                            <input class="form-control" type="file" name="product_image{{ i.id }}">
+                                            {% if i.Images %}
+                                                <p>Existing Image:</p>
+                                                <img src="{{ i.Images.url }}" class="img-sm img-thumbnail" alt="">
+                                                <input type="hidden" name="product_image{{ i.id }}" value="{{ i.Images.url }}">
+                                            {% else %}
+                                                <input type="hidden" name="product_image{{ i.id }}" value="">
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- try -->
+
+
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="mb-4">
+                                    <label for="{{ form.new_image.id_for_label }}">New Image</label>
+                                    {{ form.new_image }}
+                                    {% if product.image %}
+                                        <p>Existing Image:</p>
+                                        <img src="{{ product.image.url }}" class="img-sm img-thumbnail" alt="">
+                                        <input type="hidden" name="{{ form.new_image.name }}" value="{{ product.image.url }}">
+                                    {% else %}
+                                        <input type="hidden" name="{{ form.new_image.name }}" value="">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                        <!-- multiimages -->
+                        
+
+
+
+
+
+
+
+                        <!-- multi images -->
+                        <div class="row">
+                            <div class="col-lg-2">
+                                <div class="mb-4">
+                                    <button type="submit" class="btn btn-primary btn-sm rounded col-lg-12">Update</button>
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="mb-4">
+                                    <a href="{% url 'admin_panel:admin_delete_product' product.pid  %}" class="btn btn-primary btn-sm rounded">Delete</a>
+                                </div>  
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="mb-4">
+                                    {% comment %} <!-- <form method="post" action="{% url 'admindash:block_unblock_products' product.pid  %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm {% if not product.status %}btn-danger{% else %}btn-success{% endif %}">
+                                            {% if not product.status %}Unblock{% else %}Block{% endif %}
+                                        </button>
+                                    </form> --> {% endcomment %}
+                                    <button type="submit" class="btn btn-sm {% if not product.status %}btn-danger{% else %}btn-success{% endif %}">
+                                        {% if not product.status %}Unblock{% else %}Block{% endif %}
+                                    </button>
+                                    <a href="{% url 'admin_panel:block_unblock_products' product.pid  %}" class="btn btn-primary btn-sm rounded">Unblock</a>
+                                    
+                                </div>  
+                            </div>
+                        </div>
+                    </form>
+                    
+    </div>
+    <div class="row">
+        <!-- <div class="col-9">
+            <div class="content-header">
+                <h2 class="content-title">Veriants</h2>
+                <div>
+                    
+                   
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="card mb-4"> -->
+                <!-- <div class="card-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Sku_id</th>
+                                <th>variants</th>
+                                <th>Stock</th>
+                                <th>Availability</th>
+                                <th></th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product_variant in product_variants %}
+                            <tr>
+                                <th>{{product.product_name}}</th>
+                                <th>{{ product.sku_id }}</th>
+                                <th>
+                                    {% for atribute_value in product_variant.atributes.all %}
+                                        {{ atribute_value.atribute_value }}
+                                        {% if not forloop.last %} - {% endif %}
+                                    {% endfor %} 
+
+                                </th>
+                                <th>{{product_variant.stock}}</th>
+                                <th>
+                                    <span class="badge rounded-pill {% if product_variant.is_active %} alert-success {% else %} alert-danger {% endif %}">
+                                        {% if product_variant.is_active %} available {% else %}  Unavailable {% endif %} </span>
+                                   
+                                </th>
+                                <th>
+                                    <div class="dropdown">
+                                        <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="{% url 'product_details:edit_varient' product_variant.id %}">edit_info</a>
+
+
+                                            <a class="dropdown-item" href="#">{% if product_variant.is_active %}Make Unavailable {% else %}  Make Available {% endif %}</a>
+                                            
+                                        </div>
+                                    </div>
+                                </th>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                   
+                </div> -->
+</section>  
+
+{% endblock %}      

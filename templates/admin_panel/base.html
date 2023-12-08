@@ -1,0 +1,182 @@
+{% load static %}
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}{% endblock %}</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'admin/assets/imgs/theme/favicon.svg' %}">
+    <!-- Template CSS -->
+    <link href="{% static 'admin/assets/css/main.css' %}" rel="stylesheet" type="text/css" />
+
+   
+
+    
+</head>
+
+<body>
+    <div class="screen-overlay"></div>
+    <aside class="navbar-aside" id="offcanvas_aside">
+        <div class="aside-top">
+            <a href="#" class="brand-wrap">
+                <img src="{% static 'image/theme/logo.png' %}" class="logo" alt="Evara Dashboard">
+            </a>
+            <div>
+                <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
+            </div>
+        </div>
+        <nav>
+            <ul class="menu-aside">
+                <li class="menu-item active">
+                    <a class="menu-link" href="{% url 'admin_panel:dashboard' %}"> <i class="icon material-icons md-home"></i>
+                        <span class="text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" href="#"> <i class="icon material-icons md-shopping_bag"></i>
+                        <span class="text">Product management</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="{% url 'admin_panel:admin_products_list' %}">Product List</a>
+                        <a href="{% url 'admin_panel:admin_category_list' %}"> Categories</a>
+                        <!-- <a href="#"> Brand</a> -->
+                        <a href="#"> Attributes</a>
+                        <a href="#"> Attribute value</a>
+                        <a href="{% url 'admin_panel:admin_add_product'  %}">Add product</a>
+                    </div>
+                </li>
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" href="#"> <i class="icon material-icons md-shopping_cart"></i>
+                        <span class="text">Orders</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="#">Order list 1</a>
+                        <a href="#">Order detail</a>
+                    </div>
+                </li>
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" href="page-sellers-cards.html"> <i class="icon material-icons md-store"></i>
+                        <span class="text">Users</span>
+                    </a>
+                    <div class="submenu">
+                       
+                        <a href="{% url 'admin_auth:users_list' %}">Users list</a>
+                    </div>
+                </li>
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" href=""> <i class="icon material-icons md-monetization_on"></i>
+                        <span class="text">Transactions</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="">Transaction 1</a>
+                    </div>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="#"> <i class="icon material-icons md-comment"></i>
+                        <span class="text">Reviews</span>
+                    </a>
+                </li>
+                
+                <li class="menu-item">
+                    <a class="menu-link"  href="#"> <i class="icon material-icons md-pie_chart"></i>
+                        <span class="text">Coupon</span>
+                    </a>
+                </li>
+            </ul>
+            <hr>
+            <ul class="menu-aside">
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" href="#"> <i class="icon material-icons md-settings"></i>
+                        <span class="text">Settings</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="#">Setting sample 1</a>
+                        
+                    </div>
+                </li>
+                
+            </ul>
+            <br>
+            <br>
+        </nav>
+    </aside>
+
+    
+    <main class="main-wrap">
+        <header class="main-header navbar">
+            <div class="col-search">
+                <form class="searchform">
+                    
+                    <datalist id="search_terms">
+                        <option value="Products">
+                        <option value="New orders">
+                        <option value="Apple iphone">
+                        <option value="Ahmed Hassan">
+                    </datalist>
+                </form>
+            </div>
+            <div class="col-nav">
+                <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link btn-icon" href="#">
+                            <i class="material-icons md-notifications animation-shake"></i>
+                            <span class="badge rounded-pill">3</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn-icon darkmode" href="#"> <i class="material-icons md-nights_stay"></i> </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="requestfullscreen nav-link btn-icon"><i class="material-icons md-cast"></i></a>
+                    </li>
+                    <li class="dropdown nav-item">
+                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownLanguage" aria-expanded="false"><i class="material-icons md-public"></i></a>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownLanguag3q1e">
+                            <a class="dropdown-item text-brand" href="#"><img src="{% static 'image_admin/theme/flag-us.png' %}" alt="English">English</a>
+                            <a class="dropdown-item" href="#"><img src="{% static 'image_admin/theme/flag-fr.png' %}" alt="Français">Français</a>
+                            <a class="dropdown-item" href="#"><img src="{% static 'image_admin/theme/flag-jp.png' %}" alt="Français">日本語</a>
+                            <a class="dropdown-item" href="#"><img src="{% static 'image_admin/theme/flag-cn.png' %}" alt="Français">中国人</a>
+                        </div>
+                    </li>
+                    <li class="dropdown nav-item">
+                        {% if request.user.is_authenticated %}
+                    
+                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> 
+                            {{ request.user.username }}
+                        </a>
+                        {% endif %}
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
+                            <a class="dropdown-item" href="#"><i class="material-icons md-settings"></i>Account Settings</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger" href="{% url 'admin_auth:admin_logout' %}"><i class="material-icons md-exit_to_app"></i>Logout</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </header>
+        {% block body %}
+        
+        {% endblock %}
+    </main>
+    <script src="{% static 'admin/assets/js/vendors/jquery-3.6.0.min.js' %}"></script>\\\js
+    <script src="{% static 'admin/assets/js/vendors/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'admin/assets/js/vendors/select2.min.js' %}"></script>
+    <script src="{% static 'admin/assets/js/vendors/perfect-scrollbar.js' %}"></script>
+    <script src="{% static 'admin/assets/js/vendors/jquery.fullscreen.min.js' %}"></script>
+    <script src="{% static 'admin/assets/js/vendors/chart.js' %}"></script>
+    <!-- Main Script -->
+    <script src="{% static 'admin/assets/js/main.js' %}" type="text/javascript"></script>
+    <script src="{% static 'admin/assets/js/custom-chart.js' %}" type="text/javascript"></script>
+</body>
+
+
+<!-- Mirrored from wp.alithemes.com/html/evara/evara-backend/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Aug 2021 15:32:57 GMT -->
+</html>

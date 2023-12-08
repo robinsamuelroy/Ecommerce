@@ -1,0 +1,123 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+{% block title %} Product list {% endblock %}
+{% block  body %}
+
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Products List</h2>
+            
+        </div>
+        <div>
+
+            <a href="{% url 'admin_panel:admin_add_product'  %}" class="btn btn-primary btn-sm rounded">Create new</a>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <header class="card-header">
+            <div class="row align-items-center">
+                <div class="col col-check flex-grow-0">
+                    <div class="form-check ms-2">
+                        <input class="form-check-input" type="checkbox" value="">
+                    </div>
+                </div>
+                <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
+                    <select class="form-select">
+                        <option selected>All category</option>
+                        <option>Hybrid Solutions</option>
+                        <option>Exterior</option>
+                        <option>Interior</option>
+                    </select>
+                </div>
+                <!-- <div class="col-md-2 col-6">
+                    <input type="date" value="02.05.2021" class="form-control">
+                </div> -->
+                <!-- <div class="col-md-2 col-6">
+                    <select class="form-select">
+                        <option selected>Status</option>
+                        <option>Active</option>
+                        <option>Disabled</option>
+                        <option>Show all</option>
+                    </select>
+                </div> -->
+            </div>
+        </header> <!-- card-header end// -->
+        <div class="card-body">
+            
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Image</th>
+                                        <th>Product</th>
+                                        <th>Category</th>
+                                        <th>Status</th>
+                                        <th>Sale Price</th>                                    
+                                        <th class="text-end">Stock Quantity</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><p>Click to view details</p></tr>
+                                    
+                                    {% for product in productss %}
+                                    <tr>
+                                        <td>
+                                            {% if product.image %}
+                                            <img src="{{ product.image.url }}" class="img-sm img-thumbnail" alt="">
+                                            {% else %}
+                                            <p>No image available</p>
+                                            {% endif %}
+                                           
+                                        </td>
+                                       
+                                        <td><a href="{% url 'admin_panel:admin_products_details' product.pid %}"> <h6 class="mb-0">{{ product.title}}</h6></a></td>
+                                        <td><a href="#"> <h6 class="mb-0">{{ product.category}}</h6></a></td>
+                                        <td><a href="#"> <h6 class="mb-0">{% if product.status %} <span style="color: rgb(143, 143, 39);">Active</span>  {% else %} <span style="color: rgb(120, 40, 40);">Blocked</span> {%endif %}</h6></a></td>
+                                        <td>{{ product.price }}</td>
+                                        <td class="text-end">
+                                            <span class="badge rounded-pill {% if product.stock_count != '0' %} alert-success {% else %} alert-danger {% endif %}">
+                                                {% if product.stock_count == '0' %} Out of Stock  {% else %}{{product.stock_count}}  {% endif %} </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+            
+                        
+        
+             <!-- itemlist  .// -->
+        </div> <!-- card-body end// -->
+    </div> <!-- card end// -->
+    <!-- <div class="pagination-area mt-30 mb-50">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-start">
+                <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                <li class="page-item"><a class="page-link" href="#">02</a></li>
+                <li class="page-item"><a class="page-link" href="#">03</a></li>
+                <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                <li class="page-item"><a class="page-link" href="#">16</a></li>
+                <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
+            </ul>
+        </nav>
+    </div> -->
+</section> 
+<br/><br/>
+
+
+{% if productss.has_previous %}
+<a href="?page=1">&laquo First</a>
+<a href="?page={{products.previous_page_number}}">Previous</a>
+
+
+{%  endif %}
+Page {{productss.number}} of {{productss.paginator.num_pages}}
+{% if productss.has_next %}
+<a href="?page={{productss.next_page_number}}">Next</a>
+<a href="?page={{productss.paginator.num_pages}}">Last  &raquo</a>
+
+{% endif %}
+
+
+{% endblock %}

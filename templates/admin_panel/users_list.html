@@ -1,0 +1,74 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+{% block title %} Users List {% endblock %}
+{% block  body %}
+
+<section class="content-main">
+    <div class="content-header">
+        <h2 class="content-title">Users List</h2>
+    </div>
+    <div class="card mb-4">
+        <header class="card-header">
+            <div class="row gx-3">
+                <div class="col-lg-4 col-md-6 me-auto">
+                    <form action="{% url 'admin_auth:users_list' %}" method="get">
+                        <input type="text" name="query" placeholder="Search..." class="form-control">
+                        
+                    
+                </div>
+                <div class="col-lg-8 col-md-3 col-6">
+                    <button type="submit" class="btn btn-outline-primary">Search</button>
+                </div>
+            </form>
+                
+            </div>
+        </header> <!-- card-header end// -->
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Users Id</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th> Action </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td> {{ forloop.counter }}</td>
+                            <td>{{user.username}}</td>
+                            <td>{{user.email}}</td>
+                            <td>
+                                <form method="post" action="{%url 'admin_auth:block_unblock_user' user.id %}" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm {% if not user.is_active %}btn-danger{% else %}btn-success{% endif %}">
+                                        {% if not user.is_active %}Unblock{% else %}Block{% endif %}
+                                    </button>
+                                </form>
+                            </td>
+                            
+                        </tr>
+                        
+                        {% endfor %}
+                    </tbody>
+                </table> <!-- table-responsive.// -->
+            </div>
+        </div> <!-- card-body end// -->
+    </div> <!-- card end// -->
+    <!-- <div class="pagination-area mt-15 mb-50">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-start">
+                <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                <li class="page-item"><a class="page-link" href="#">02</a></li>
+                <li class="page-item"><a class="page-link" href="#">03</a></li>
+                <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                <li class="page-item"><a class="page-link" href="#">16</a></li>
+                <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
+            </ul>
+        </nav>
+    </div> -->
+</section>
+
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+{% block title %} Users List {% endblock %}
+{% block  body %}
+<div class="card">
+    <div class="card-body">
+        <div class="container ">
+            <div class="col-md-3">
+                <form method="post" action="" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                      <label>Existing Image:</label>
+                      {% if categories_image %}
+                          <img src="{{ categories_image.url}}" alt="Category Image" style="max-width: 200px; max-height: 200px;">
+                      {% else %}
+                          <p>No image available</p>
+                      {% endif %}
+                    </div>
+                    <div class="mb-4">
+                      <label for="category_name">Category Name:</label>
+                      <input type="text" name="category_name" value="{{ categories_title }}" required>
+                  
+                    </div>
+                    <div class="card-body">
+                      <div class="input-upload">
+                        <label for="category_image">Category Image:</label>
+                        
+                        <input type="file" name="category_image">
+                        
+                      </div>
+                  </div>
+                        
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Apply Changes</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

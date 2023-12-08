@@ -1,0 +1,85 @@
+{% extends 'part/base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    /* Add space from top and bottom of the form */
+    .login_part {
+        padding-top: 50px;
+        padding-bottom: 50px;
+    }
+</style>
+
+<div class="container">
+    {% if form.errors %}
+    <div class="alert alert-danger">
+        <strong>
+            {% for field_name, error_list in form.errors.items %}
+                {% if field_name == 'password1' %}
+                    Password: {{ error_list|join:", " }}
+                {% elif field_name == 'password2' %}
+                    Confirm Password: {{ error_list|join:", " }}
+                {% else %}
+                    {{ error_list|join:", " }}
+                {% endif %}
+            {% endfor %}
+        </strong>
+    </div>
+    {% endif %}
+</div>
+
+<section class="login_part section_padding">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 col-md-6">
+                <div class="login_part_text text-center">
+                    <div class="login_part_text_iner">
+                        <h2>Already signed up?</h2>
+                        <p>There are advances being made in science and technology
+                            everyday, and a good example of this is the</p>
+                        <a href="{% url 'accounts:login' %}" class="btn_3">Sign in</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6">
+                <div class="login_part_form">
+                    <div class="login_part_form_iner">
+                        <h3>Please Sign up now</h3>
+                        
+                        <form class="row contact_form" action="{% url 'accounts:signup' %}" method="post" novalidate="novalidate">
+                            {% csrf_token %}
+                            {{ form.non_field_errors }}
+                            <div class="col-md-12 form-group p_star">
+                                {{form.first_name}}
+                            </div>
+                            <div class="col-md-12 form-group p_star">
+                                {{form.last_name}}
+                            </div>
+                            <div class="col-md-12 form-group p_star">
+                                {{ form.username}}
+                            </div>
+                            
+                            <div class="col-md-12 form-group p_star">
+                                {{form.email}}
+                            </div>
+                            <div class="col-md-12 form-group p_star">
+                                {{form.password1}}
+                            </div>
+                            <div class="col-md-12 form-group p_star">
+                                {{form.password2}}
+                            </div>
+                            
+
+                            <button type="submit" value="submit" class="btn_3">
+                                submit
+                            </button>
+                    
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+{% block title %} Category {% endblock %}
+{% block  body %}
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Categories </h2>
+            <p>Add, edit or delete a category</p>
+        </div>
+        <div>
+            <input type="text" placeholder="Search Categories" class="form-control bg-white">
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <form method="post" action="{% url 'admin_panel:admin_add_category'  %}"enctype="multipart/form-data">
+                      {% csrf_token %}
+                      {% if messages %}
+                    <div class="messages">
+                 {% for message in messages %}
+                    <div class="{% if message.tags %}alert alert-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                    </div>
+                    {% endfor %}
+                    </div>
+                    {% endif %}
+                        <div class="mb-4">
+                            <label for="product_name" class="form-label">Category Name</label>
+                            <input type="text" placeholder="Type here" class="form-control" id="product_name" name="category_name"/>
+                        </div>
+                        <!-- <div class="mb-4">
+                            <label class="form-label">Parent</label>
+                            <select class="form-select" name="parent">
+                                {% for category in categories %}
+                                    {% if category.cid is not None %}
+                                        <option value="{{ category.title }}">{{ category.title }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                                <option value="None">None</option>
+                            </select>
+                        </div> -->
+                        <div class="card-body">
+                          <div class="input-upload">
+                              <label for="category_image">Image</label>
+                              <input class="form-control" type="file" required="True" name="category_image">
+                          </div>
+                      </div>
+
+
+
+
+                        <!-- <div class="mb-4">
+                            <label class="form-label">Description</label>
+                            <textarea placeholder="Type here" class="form-control" name="description"></textarea>
+                        </div> -->
+                        <div class="d-grid">
+                            <button class="btn btn-primary">Create category</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-9">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Category Name</th>
+                                    
+                                    <th>Image</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for category in categories %}
+                                <tr>
+                                    <td>{{category.cid}}</td>
+                                    <td><b>{{category.title}}</b></td>
+                                    <td>
+                                      {% if category.image %}
+                                      <img src="{{ category.image.url }}" class="img-sm img-thumbnail" alt="">
+                                      {% else %}
+                                      <p>No image available</p>
+                                      {% endif %}
+                                     
+                                    </td>
+                                    
+                                    <td>
+                                      <!-- <p>available</p> -->
+                                        <!-- <button  class="{% if not category.is_available %}btn btn-outline-danger{% else %}btn btn-outline-success{% endif %}">
+                                            {% if not category.is_available %}Not Available {% else %}Available{% endif %}
+                                        </button> -->
+                                    </td>
+                                    <td class="text-end" >
+                                        <div class="dropdown">
+                                         
+                                            <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
+                                            <div class="dropdown-menu">
+                                                <!-- <a class="dropdown-item" href="#">View detail</a> -->
+                                                <a class="dropdown-item" href="{% url 'admin_panel:admin_category_edit' category.cid  %}">edit_info</a>
+
+
+                                                <a class="dropdown-item" href="{% url 'admin_panel:block_unblock_category' category.cid %}">{% if not category.is_blocked %} Available {% else %} Unavailable{% endif %}</a>
+                                                <a class="dropdown-item text-danger" href="{% url 'admin_panel:admin_delete_category' category.cid %}">Delete</a>
+                                            </div>
+                                        </div> <!-- dropdown //end -->
+                                     
+                                    </td>
+                                </tr>
+                                {% endfor %}
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div> <!-- .col// -->
+            </div> <!-- .row // -->
+        </div> <!-- card body .// -->
+    </div> <!-- card .// -->
+</section>
+
+
+{% endblock %}
