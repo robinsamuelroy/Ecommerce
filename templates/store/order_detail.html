@@ -1,0 +1,113 @@
+{% extends 'part/base.html' %}
+
+{% load static %}
+
+{% block content %}
+<!-- breadcrumb-section -->
+
+<article class="card mx-auto col-10  ">
+    <div class="card-body mx-auto col-10"> 
+           
+<div class="breadcrumb-section breadcrumb-bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2 text-center">
+                <div class="breadcrumb-text">
+                    <h1>Your Profile</h1>
+                    <p>Order Details</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end breadcrumb section -->
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        
+        <!-- Main content area -->
+        <main class="main-content col-lg-12">
+            <div class="table-container">
+                <table class="table">
+                  <h5>Product Details</h5>
+                    <thead>
+                        <tr>
+                            <th scope="col">Product Image</th>
+                            <th scope="col">Product Name</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0">
+                        {% for order_product in order_products %}
+                        <tr>
+                            <td><img src="{{ order_product.product.image.url }}" alt="{{ order_product.product.title }}" width="100"></td>
+                            <td>
+                                <p>{{ order_product.product.title }}</p>
+                                <p>colour: {{ order_product.color}}</p>
+                            </td>
+
+                            <td>{{ order_product.quantity }}</td>
+                            <td>₹{{ order_product.product_price }}</td>
+                            <td>₹{{ order_product.total }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <table class="table">
+                  <h5>Address Details</h5>
+                    <thead>
+                        <tr>
+                            <th scope="col">Full Name</th>
+                            <th scope="col">Full Address</th>
+                            <th scope="col">Mobile</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0">
+                      {% for order in orders %}
+                        <tr>
+                            <td><strong>{{ order.selected_address.first_name }}</strong></td>
+                            <td>
+                              <p>{{ order.selected_address.address_line_1 }}</p>
+                              <p>{{ order.selected_address.city }} - {{ order.selected_address.state }}</p>
+                            </td>
+                            <td>{{ order.selected_address.phone }}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                </table>
+                <table class="table">
+                  <h5>Payment Details</h5>
+                    <thead>
+                        <tr>
+                            <th scope="col">Payment Method</th>
+                            <th scope="col">Full Amount with GST and Shipping</th>
+                            <th scope="col">Payment Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0">
+                      {% for payment in payments %}
+                        <tr>
+                            <td>{{ payment.payment_method }}</td>
+                            <td>₹{{ payment.amount_paid }}</td>
+                            <td>{{ payment.status }}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                    
+                </table>
+                {% for order in orders %}
+               <!-- <a href="#" class="btn btn-sm btn-primary">View Invoice</a> -->
+                {% endfor %}
+            </div>
+        </main>
+    </div>
+</div>
+</div>
+
+
+</article>
+
+{% endblock %}

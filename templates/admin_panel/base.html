@@ -37,6 +37,12 @@
                 <li class="menu-item active">
                     <a class="menu-link" href="{% url 'admin_panel:dashboard' %}"> <i class="icon material-icons md-home"></i>
                         <span class="text">Dashboard</span>
+
+                        <div class="submenu">
+                            <a href="{% url 'admin_panel:dashboard' %}">Dashboard</a>
+                            <a href="{% url 'admin_panel:sales_report' %}">sales report</a>
+                            <a href="{% url 'admin_panel:reports' %}">reports</a>
+                        </div>
                     </a>
                 </li>
                 <li class="menu-item has-submenu">
@@ -45,22 +51,63 @@
                     </a>
                     <div class="submenu">
                         <a href="{% url 'admin_panel:admin_products_list' %}">Product List</a>
-                        <a href="{% url 'admin_panel:admin_category_list' %}"> Categories</a>
                         <!-- <a href="#"> Brand</a> -->
-                        <a href="#"> Attributes</a>
-                        <a href="#"> Attribute value</a>
+                        {% comment %} <a href="#"> Attributes</a>
+                        <a href="#"> Attribute value</a> {% endcomment %}
                         <a href="{% url 'admin_panel:admin_add_product'  %}">Add product</a>
                     </div>
                 </li>
+
                 <li class="menu-item has-submenu">
-                    <a class="menu-link" href="#"> <i class="icon material-icons md-shopping_cart"></i>
+                    <a class="menu-link" href="#"> <i class="icon material-icons md-shopping_bag"></i>
+                        <span class="text">Color management</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="{% url 'admin_panel:color' %}">Color List</a>
+                        <a href="{% url 'admin_panel:add_color'  %}">Add Color</a>
+                    </div>
+                </li>
+
+
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" href="page-sellers-cards.html"> <i class="icon material-icons md-store"></i>
+                        <span class="text">Category</span>
+                    </a>
+                    <div class="submenu">
+                       
+                        <a href="{% url 'admin_panel:admin_category_list' %}">Category list</a>
+                    </div>
+                </li>
+
+
+
+
+
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" href="page-sellers-cards.html"> <i class="icon material-icons md-store"></i>
+                        <span class="text">Product Variants</span>
+                    </a>
+                    <div class="submenu">
+                       
+                        <a href="{% url 'admin_panel:variant-list' %}">Variant list</a>
+                        <a href="{% url 'admin_panel:add-variant' %}">Add Variant</a>
+                    </div>
+                </li>
+
+
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" href="page-sellers-cards.html"> <i class="icon material-icons md-store"></i>
                         <span class="text">Orders</span>
                     </a>
                     <div class="submenu">
-                        <a href="#">Order list 1</a>
-                        <a href="#">Order detail</a>
+                       
+                        <a href="{% url 'admin_panel:order_list' %}">Order list</a>
                     </div>
                 </li>
+
+
+
+
                 <li class="menu-item has-submenu">
                     <a class="menu-link" href="page-sellers-cards.html"> <i class="icon material-icons md-store"></i>
                         <span class="text">Users</span>
@@ -70,6 +117,23 @@
                         <a href="{% url 'admin_auth:users_list' %}">Users list</a>
                     </div>
                 </li>
+
+
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" disabled > <i class="icon material-icons md-pie_chart"></i>
+                        <span class="text">coupons</span></a>
+                        <div class="submenu">
+                            <a href="{% url 'admin_panel:list_coupons' %}">coupon list</a>
+                            <a href="{% url 'admin_panel:add_coupon' %}">Add coupon </a>  
+                        </div>
+                    
+                </li>
+
+
+
+
+
+
                 <li class="menu-item has-submenu">
                     <a class="menu-link" href=""> <i class="icon material-icons md-monetization_on"></i>
                         <span class="text">Transactions</span>

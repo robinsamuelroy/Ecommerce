@@ -1,0 +1,103 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+{% block body %}
+
+        
+         <style>
+            .tax-row {
+                border-top: 4px solid red; /* Add red bottom border to the Tax row */
+            }
+        </style>
+    <div class="container mt-5">
+        <div class="text-center">
+            <h1>Ordered Product Details for Order ID: {{ order.order_number }}</h1>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered table-sm">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Order ID</th>
+                        <th>User name</th>
+                        <th>Email</th>
+                        <th>Address</th>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ordered_product in ordered_products %}
+                    <tr>
+                        {% if forloop.first %}
+                            <td rowspan="{{ ordered_products.count }}">{{ order.order_number }}</td>
+                            <td rowspan="{{ ordered_products.count }}">{{ order.user.first_name }} {{ order.user.last_name }}</td>
+                            <td rowspan="{{ ordered_products.count }}">{{ order.user.email }}</td>
+                            <td rowspan="{{ ordered_products.count }}">
+                                {{ order.selected_address.address_line_1 }}<br>
+                                {{ order.selected_addressaddress_line_2 }}<br>
+                                {{ order.selected_address.city }}<br>
+                                {{ order.selected_address.state }}<br>
+                                {{ order.selected_address.pincode }}
+                            </td>
+                        {% endif %}
+                        <td>{{ ordered_product.product.title }}</td>
+                        <td>{{ ordered_product.quantity }}</td>
+                        <td>${{ ordered_product.product_price }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="tax-row">
+                        <td colspan="6" class="text-right">Total:</td>
+                        <td>{{ total }}</td>
+                    </tr>
+                    <tr >
+                        <td colspan="6" class="text-right">Tax:</td>
+                        <td>{{ order.tax }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" class="text-right">Discount:</td>
+                        {% if not order.discount %}
+                        <td>0.00</td>
+                        {% else %}
+                        <td>{{ order.discount }}</td>
+                        {% endif %}
+                    </tr>
+                    <tr>
+                        <td colspan="6" class="text-right">Grand total:</td>
+                        <td>{{ order.order_total }}</td>
+                    </tr>
+                    {% for payment in payments %}
+                    <tr class="payment">
+                        <td colspan="6" class="text-right">Payment Status:</td>
+                        <td>Status: {{ payment.status }}</td>
+                    </tr>
+                    <tr class="payment">
+                        <td colspan="6" class="text-right">Payment Method:</td>
+                        <td>{{ payment.payment_method }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="container mt-3">
+        <div class="text-center">
+            <form action="{% url 'admin_panel:update_order_status' order_id=order.id %}" method="post" class="form-inline">
+                {% csrf_token %}
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="status" class="mr-2">Order Status</label>
+                    <select class="form-control custom-select" id="status" name="status" {% if order.status == 'Cancelled' %}disabled{% endif %}>
+                        {% for status_value, status_label in order.STATUS %}
+                            <option value="{{ status_value }}" {% if order.status == status_value %}selected{% endif %}>{{ status_label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% if order.status != 'Cancelled' %}
+                    <button class="btn btn-primary mb-2" type="submit">Apply</button>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+{% endblock %}

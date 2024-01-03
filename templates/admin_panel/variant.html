@@ -1,0 +1,95 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+
+
+
+
+{% block body %}
+<div class="col-lg-12 d-flex align-items-stretch">
+    <div class="card w-100">
+        <div class="card-body p-4">
+            <h5 class="card-title fw-semibold mb-4">Product variation</h5>
+            <div class="search-container">
+                <form action="#" method="get">
+                    <input type="text" name="search" placeholder="Search by brand name">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+            </div>
+            <div class="d-flex justify-content-end mb-3">
+                <a href="{% url 'catagorie:add-variant' %}" class="btn btn-primary">Add Variation</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table text-nowrap mb-0 align-middle">
+                    <thead class="text-dark fs-4">
+                        <tr>
+
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Image</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">product Name</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">color</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">size</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">stock</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">is_active</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Actions</h6>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in product_varient %}
+                        <tr>
+                            <td><img src="{{product.image.url}}" alt="{{ product.name }}" height="50"></td>
+                            <td>{{product.product}}</td>
+                            <td>{{product.color}}</td>
+                            <td>{{product.size}}</td>
+                            <td>{{product.stock}}</td>
+                            <td>{{product.is_active}}</td>
+                            <td>
+                                <a href="{% url 'catagorie:edit_variant' variant_id=product.id %}" class="btn btn-sm btn-primary">Edit</a>
+                                <form method="post" action="{% url 'catagorie:delete-variant' product.id %}" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this category?')">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div class="pagination">
+    <span class="step-links">
+        {% if product_varient.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ product_varient.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ product_varient.number }} of {{ product_varient.paginator.num_pages }}.
+        </span>
+
+        {% if product_varient.has_next %}
+            <a href="?page={{ product_varient.next_page_number }}">next</a>
+            <a href="?page={{ product_varient.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+{% endblock %}

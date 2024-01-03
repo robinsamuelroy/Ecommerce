@@ -1,30 +1,214 @@
+from collections import defaultdict
+import datetime
 from django.shortcuts import render,redirect,get_object_or_404
-from store.models import Product,Category,ProductImages
+from store.models import *
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_control
-from admin_panel.forms import CreateProductForm
-from django.http import HttpResponse,HttpResponseRedirect
+from admin_panel.forms import BrandForm, ColorForm, CreateProductForm, ProductVariantForm
+from django.http import HttpResponse, HttpResponseBadRequest,HttpResponseRedirect
 from django.forms import inlineformset_factory
 from django.contrib import messages
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q
+from django.core.files.uploadedfile import SimpleUploadedFile
+from PIL import Image
+from admin_panel.forms import CouponForm
+from admin_auth import views
+from django.db.models import Count, Sum
+from datetime import datetime
 
 
 # Create your views here.
-@login_required(login_url='admin_auth:admin_login')
+# @login_required(login_url='admin_auth:admin_login')
+# @cache_control(no_cache=True, must_revalidate=True, no_store=True)
+# def dashboard(request):
+#   if request.user.is_authenticated and not request.user.is_superadmin:
+#     return redirect('admin_auth:admin_login')
+  
+#   product_count = Product.objects.count()
+#   category_count = Category.objects.count()
+
+#   context={
+#         'product_count':product_count,
+#         'category_count':category_count
+#     }
+  
+#   return render(request,'admin_panel/dashboard.html',context)
+
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def dashboard(request):
-  if request.user.is_authenticated and not request.user.is_superadmin:
-    return redirect('admin_auth:admin_login')
-  
-  product_count = Product.objects.count()
-  category_count = Category.objects.count()
+    
+    if not request.user.is_authenticated:
+        return redirect('admin_auth:admin_login')
 
-  context={
-        'product_count':product_count,
-        'category_count':category_count
+    total_users_count = int(Account.objects.count())
+    product_count = Product.objects.count()
+    user_order = Order.objects.filter(is_ordered=True).count()
+    # for i in monthly_order_totals:
+    completed_orders = Order.objects.filter(is_ordered=True)
+
+    monthly_totals_dict = defaultdict(float)
+
+    # Iterate over completed orders and calculate monthly totals
+    for order in completed_orders:
+        order_month = order.created_at.strftime('%m-%Y')
+        monthly_totals_dict[order_month] += float(order.order_total)
+
+    print(monthly_totals_dict)
+    months = list(monthly_totals_dict.keys())
+    totals = list(monthly_totals_dict.values())
+
+    variants = ProductVariant.objects.all()
+
+    context = {
+        'total_users_count': total_users_count,
+        'product_count': product_count,
+        'order': user_order,
+        'variants': variants,
+        'months': months,
+        'totals': totals,
+
+
     }
+    return render(request, 'admin_panel/charts.html', context)
+
+
+
+@login_required(login_url='admin_auth:admin_login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def charts(request):
+    if not request.user.is_authenticated:
+        return redirect('admin_auth:admin_login')
+    
+    return render(request, 'admin_panel/charts.html')
+
+
+@login_required(login_url='admin_auth:admin_login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def reports(request):
+     if not request.user.is_authenticated:
+        return redirect('admin_auth:admin_login')
+    
+     return render(request, 'admin_panel/report.html')
+
+
+@login_required(login_url='admin_auth:admin_login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def filtered_sales(request):
+    if not request.user.is_authenticated:
+        return redirect('admin_auth:admin_login')
+    # Get the minimum and maximum price values from the request parameters
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    from_date = f'{start_date}+00:00'
+    to_date = f'{end_date} 23:59:59+00:00'
+    orders = Order.objects.filter(
+        created_at__gte=from_date, created_at__lte=to_date,is_ordered=True )
+
+    context = {
+        "sales": orders,
+        "start_date": start_date,
+        "end_date": end_date
+
+    }
+
+    return render(request, 'admin_panel/report.html', context)
+
+from django.db.models.functions import TruncDate, TruncWeek, TruncMonth, TruncYear
+@login_required(login_url='admin_auth:admin_login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def sales_report(request):
+    if not request.user.is_authenticated:
+        return redirect('admin_auth:admin_login')
+    
+    if request.method == 'POST':
+        fromd=request.POST.get('fromDate')
+        tod=request.POST.get('toDate')
+        from_date = request.POST.get('fromDate')
+        to_date = request.POST.get('toDate')
+        time_period = request.POST.get('timePeriod')
+        print(time_period)
+
   
-  return render(request,'admin_panel/dashboard.html',context)
+        if not from_date or not to_date:
+            
+            messages.error(request,"Please provide valid date values.")
+            return redirect('admin_panel:sales_report')
+
+    
+        try:
+            from_date = datetime.strptime(from_date, '%Y-%m-%d')
+            to_date = datetime.strptime(to_date, '%Y-%m-%d')
+        except ValueError:
+            return HttpResponseBadRequest("Invalid date format.")
+
+        
+        if time_period == 'all':
+            sales_data = Order.objects.filter(created_at__range=[from_date, to_date], is_ordered=True) \
+                .annotate(truncated_date=TruncDate('created_at')) \
+                .values('truncated_date') \
+                .annotate(total_orders=Count('id'), total_revenue=Sum('order_total'))
+        elif time_period == 'daily':
+            sales_data = Order.objects.filter(created_at__date__range=[from_date, to_date], is_ordered=True) \
+                .annotate(truncated_date=TruncDate('created_at')) \
+                .values('truncated_date') \
+                .annotate(total_orders=Count('id'), total_revenue=Sum('order_total'))
+        elif time_period == 'weekly':
+            sales_data = Order.objects.filter(created_at__range=[from_date, to_date], is_ordered=True) \
+                .annotate(truncated_date=TruncWeek('created_at')) \
+                .values('truncated_date') \
+                .annotate(total_orders=Count('id'), total_revenue=Sum('order_total'))
+        elif time_period == 'monthly':
+            sales_data = Order.objects.filter(created_at__range=[from_date, to_date], is_ordered=True) \
+                .annotate(truncated_date=TruncMonth('created_at')) \
+                .values('truncated_date') \
+                .annotate(total_orders=Count('id'), total_revenue=Sum('order_total'))
+        elif time_period == 'yearly':
+            sales_data = Order.objects.filter(created_at__range=[from_date, to_date], is_ordered=True) \
+                .annotate(truncated_date=TruncYear('created_at')) \
+                .values('truncated_date') \
+                .annotate(total_orders=Count('id'), total_revenue=Sum('order_total'))
+
+
+        # Define the dateWise queryset for daily sales data
+        dateWise = Order.objects.filter(created_at__date__range=[from_date, to_date],is_ordered=True) \
+        .values('created_at__date') \
+        .annotate(total_orders=Count('id'), total_revenue=Sum('order_total'))
+        
+        
+
+        # Calculate Total Users
+        total_users = Order.objects.filter(is_ordered=True).values('user').distinct().count()
+
+        # Calculate Total Products
+        total_products = OrderProduct.objects.filter(order__is_ordered=True).values('product').distinct().count()
+
+        # Calculate Total Orders
+        total_orders = Order.objects.filter(is_ordered=True).count()
+
+        # Calculate Total Revenue
+        total_revenue = Order.objects.filter(is_ordered=True).aggregate(total_revenue=Sum('order_total'))['total_revenue']
+        
+        context = {
+            'sales_data': sales_data,
+            'from_date': from_date,
+            'to_date': to_date,
+            'report_type': time_period,
+            'total_users': total_users,
+            'total_products': total_products,
+            'total_orders': total_orders,
+            'total_revenue': total_revenue,
+            'dateWise': dateWise,
+            'fromd':fromd,
+            'tod':tod, 
+        }
+
+        return render(request, 'admin_panel/sales_report.html', context)
+
+    return render(request, 'admin_panel/sales_report.html')
+
 
 ################################################################################
 
@@ -172,7 +356,7 @@ def add_product(request):
             image_field_name = f'product_image{i}'
             image = request.FILES.get(image_field_name)
             if image:
-                ProductImages.objects.create(product=product, Images=image)
+                ProductImages.objects.create(product=product,images=image)
 
         return redirect('admin_panel:admin_products_list')
     else:
@@ -201,7 +385,7 @@ def delete_product(request,pid):
         return HttpResponse("Product not found", status=404)
     
     
-    
+  ###################################################################################################  
     
 def admin_category_list(request):
     if not request.user.is_authenticated:
@@ -215,6 +399,28 @@ def admin_category_list(request):
     
     return render(request,'admin_panel/admin_category_list.html',context)
 
+# def admin_add_category(request):
+#     if request.method == 'POST':
+#         cat_title = request.POST.get('category_name')
+#         if Category.objects.filter(title=cat_title).exists():
+#             messages.error(request, 'Category with this title already exists.')
+#         else:
+#             cat_data = Category(title=cat_title, image=request.FILES.get('category_image'))
+#             cat_data.save()
+#             messages.success(request, 'Category added successfully.')
+        
+        
+#         cat_data = Category(title=cat_title,
+#                             image=request.FILES.get('category_image'))
+    
+    #     # cat_data.save()
+    # else:
+    #     return render(request, 'admin_panel/admin_add_category.html')
+    
+    # return render(request, 'admin_panel/admin_category_list.html')
+
+
+
 def admin_add_category(request):
     if request.method == 'POST':
         cat_title = request.POST.get('category_name')
@@ -224,19 +430,9 @@ def admin_add_category(request):
             cat_data = Category(title=cat_title, image=request.FILES.get('category_image'))
             cat_data.save()
             messages.success(request, 'Category added successfully.')
+            return redirect('your_redirect_url_name')  # Replace 'your_redirect_url_name' with your desired URL
         
-        
-        # cat_data = Category(title=cat_title,
-        #                     image=request.FILES.get('category_image'))
-    
-        # cat_data.save()
-    else:
-        return render(request, 'admin_panel/admin_category_list.html')
-    
-    return render(request, 'admin_panel/admin_category_list.html')
-
-    
-#######################################################################################
+    return render(request, 'admin_panel/admin_add_category.html')
 
 
 
@@ -298,16 +494,251 @@ def available_category(request,cid):
     else:
         category.is_blocked=True
     category.save()
-
-    
-    # cat_list=Category.objects.filter(parent_id=category_id)
-    # for i in cat_list.values():
-    #     print(i)
-    
-    # for category in cat_list:
-    #     if category.is_available:
-    #         category.is_available=False
-    #     else:
-    #         category.is_available=True
-    #     category.save()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+
+# variants adding
+
+#################################################################################################
+def variant_list(request):
+    product_variations = ProductVariant.objects.all()
+    form = ProductVariantForm()
+    context = {
+        'product_variant': product_variations,
+        'form':form
+        }
+    return render(request, 'admin_panel/listvariants.html', context)
+
+def add_variant(request):
+    if request.method == "POST":
+        variant_form = ProductVariantForm(request.POST,request.FILES)
+        if variant_form.is_valid():
+            variant_form.save()
+            return redirect("admin_panel:variant-list")
+    else:
+        variant_form = ProductVariantForm()
+    context = {
+        'variant_form': variant_form
+        }
+      
+    return render(request, 'admin_panel/addvariants.html', context)
+
+def edit_variant(request, id):
+    product = get_object_or_404(ProductVariant, pk=id)
+    if request.method == "POST":
+        variant_form = ProductVariantForm(request.POST, request.FILES, instance=product)
+        if variant_form.is_valid():
+            variant_form.save()
+            return redirect('admin_panel:variant-list')
+    else:
+        variant_form = ProductVariantForm(instance=product)
+
+    context = {
+        "variant_form": variant_form
+    }
+    return render(request, 'admin_panel/edit_variants.html', context)
+
+def delete_variant(request, id):
+    if request.method == "POST":
+        prod = ProductVariant.objects.get(id=id)
+        prod.delete()
+        return redirect('admin_panel:variant-list')
+
+###############################################################################################
+
+@login_required(login_url="ad_login")
+def brand(request):
+    pro = Brand.objects.all()
+    context = {
+      'pro': pro
+    }
+    return render(request,"admin_panel/brand-info.html",context)
+
+def del_brand(request,id):
+    if request.method == "POST":
+        pro = Brand.objects.get(pk=id)
+        pro.delete()
+        return redirect('admin_panel:brand')
+    
+def edit_brand(request,id):
+    brand = get_object_or_404(Brand,pk=id)
+    if request.method == "POST":
+        brand_form = BrandForm(request.POST,instance=brand)
+        if brand_form.is_valid():
+            brand_form.save()
+            return redirect('admin_panel:brand')
+    else:
+        brand_form = BrandForm(instance=brand)
+    context = {
+        'brand_form':brand_form
+    }
+    return render(request,"admin_panel/edit-brand.html",context)
+
+def add_brand(request):
+    if request.method == "POST":
+        brand_form = BrandForm(request.POST,request.FILES)
+        # image_form = ProductImageFormSet(request.POST, request.FILES, instance=product())
+        if brand_form.is_valid():
+            # myproduct = product_form.save(commit=False)
+            brand_form.save()
+            # image_form.instance = myproduct
+            # image_form.save()
+            # return redirect('products')
+            return redirect("admin_panel:brand")
+    else:
+        brand_form = BrandForm()
+        # image_form = ProductImageFormSet(instance=product())
+    context = {'brand_form': brand_form}
+    return render(request,'admin_panel/add-brand.html',context)
+
+
+@login_required(login_url="ad_login")
+        
+def color(request):
+    prod = Color.objects.all()
+    context = {
+      'prod': prod
+    }
+    return render(request,"admin_panel/color-info.html",context)
+
+def del_color(request,id):
+    if request.method == "POST":
+        prod = Color.objects.get(pk=id)
+        prod.delete()
+        return redirect('admin_panel:color')
+    
+def edit_color(request,id):
+    product = get_object_or_404(Color,pk=id)
+    if request.method == "POST":
+        color_form = ColorForm(request.POST,request.FILES,instance=product)
+        if color_form.is_valid():
+            color_form.save()
+            return redirect('admin_panel:color')
+    else:
+        color_form = ColorForm(instance=product)
+    context = {
+        'color_form':color_form
+    }
+    return render(request,"admin_panel/edit-color.html",context)
+    
+def add_color(request):
+    if request.method == "POST":
+        color_form = ColorForm(request.POST,request.FILES)
+        if color_form.is_valid():
+            color_form.save()
+            return redirect("admin_panel:color")
+    else:
+        color_form = ColorForm()
+    context = {'color_form': color_form}
+    return render(request, 'admin_panel/add-color.html', context)
+
+##########################################################################################################
+
+
+@login_required(login_url='admin_auth:admin_login')
+def order_list(request):
+    if not request.user.is_authenticated:
+        return redirect('admin_panel:dashboard')
+    
+    orders = Order.objects.filter(is_ordered=True).order_by('-created_at')  # Fetch all orders from the Order model
+    context = {'orders': orders}
+    return render(request, 'admin_panel/orderlist.html', context)
+
+@login_required(login_url='admin_auth:admin_login')
+def ordered_product_details(request, order_id):
+    if not request.user.is_authenticated:
+        return redirect('admin_panel:dashboard')
+    
+    orders = Order.objects.get(id=order_id)
+    print(orders)
+    order_instance = Order.objects.get(id=order_id)
+
+# Retrieving related OrderProduct instances using the default reverse relation
+    ordered_products = order_instance.orderproduct_set.all()
+
+
+    print(ordered_products)
+    for i in ordered_products:
+        total=+(i.product_price*i.quantity)
+    payments = Payment.objects.filter(order__id=order_id,user=orders.user)    
+
+    context = {
+        'total':total,
+        'order': orders,
+        'ordered_products': ordered_products,
+        'payments':payments
+    }
+    return render(request, 'admin_panel/ordered_product_details.html', context)
+
+@login_required(login_url='admin_auth:admin_login')
+def update_order_status(request, order_id):
+    if not request.user.is_authenticated:
+        return redirect('admin_panel:dashboard')
+    
+    if request.method == 'POST':
+        order = get_object_or_404(Order, id=int(order_id))
+        status = request.POST['status']
+        order.status = status
+        order.save()
+        if status=='Completed':
+            payment=Payment.objects.get(order__id=order_id,user=order.user)
+            if payment.payment_method=='Cash on Delivery':
+                payment.status='Paid'
+                payment.save()
+        return redirect('admin_panel:order_list')
+    else:
+        return HttpResponseBadRequest("Bad request.")
+    
+
+###################################################################################################
+
+
+def add_coupon(request):
+    if request.method == 'POST':
+        form = CouponForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_panel:list_coupons')  # Redirect to the list of coupons or another page
+    else:
+        form = CouponForm()
+    
+    return render(request, 'admin_panel/add coupons.html', {'form': form})
+
+
+# from cart.models import *
+def list_coupons(request):
+    coupons=Coupon.objects.filter(is_active=True)
+    return render(request,'admin_panel/list_coupon.html',{"coupons":coupons})
+
+@login_required(login_url='admin_auth:admin_login')
+def delete_coupon(request, id):
+    if not request.user.is_authenticated:
+        return redirect('admin_auth:admin_login')
+
+    try:
+        coupon = Coupon.objects.get(id=id)
+        coupon.is_active=False
+        coupon.save()
+    except Coupon.DoesNotExist:
+        # Handle the case where the coupon with the given ID doesn't exist
+        pass
+
+    return redirect('admin_panel:list_coupons')
+
+
+@login_required(login_url='admin_auth:admin_login')
+def edit_coupon(request, id):
+    coupon = get_object_or_404(Coupon, pk=id)
+    if not request.user.is_authenticated:
+        return redirect('admin_auth:admin_login')
+
+    if request.method == 'POST':
+        form = CouponForm(request.POST,instance=coupon)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_panel:list_coupons')
+    else:
+        form = CouponForm(instance=coupon)
+    return render(request, 'admin_panel/edit_coupon.html', {'form': form})
+
+##################################################################################

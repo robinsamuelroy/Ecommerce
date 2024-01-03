@@ -147,5 +147,5 @@ EMAIL_USE_TLS=True
 EMAIL_HOST='smtp.gmail.com'
 EMAIL_FROM='robinsamuelroy576@gmail.com'
 EMAIL_HOST_USER='robinsamuelroy576@gmail.com'
-EMAIL_HOST_PASSWORD='asqw tndz jgzf qjvr'
+EMAIL_HOST_PASSWORD='vuhj jpiz qqde tneg'
 EMAIL_PORT=587

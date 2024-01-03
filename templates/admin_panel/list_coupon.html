@@ -1,0 +1,50 @@
+
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block body %}
+<div class="container">
+    <div class="text-center"><h1>Coupon List</h1></div>
+    
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Coupon Code</th>
+                    <th>Coupon Description</th>
+                    <th>Expiry Date</th>
+                    <th>Discount</th>
+                    <th>No Usage</th>
+                    <th>Minimum Purchase Value</th>
+                    <th>Maximum Purchase Value</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for coupon in coupons %}
+                <tr>
+                    <td>{{ coupon.code }}</td>
+                    <td>{{ coupon.description }}</td>
+                    <td>{{ coupon.expiration_date }}</td>
+                    <td>{{ coupon.discount }}</td>
+                    <td>{{ coupon.Usage_count }}</td>
+                    <td>{{ coupon.minimum_purchase_value }}</td>
+                    <td>{{ coupon.maximum_purchase_value }}</td>
+                    <td class="actions">
+                        <a href="{% url 'admin_panel:edit_coupon' id=coupon.id %}" class="btn btn-sm btn-primary">Edit</a>
+                        <form method="post" action="{% url 'admin_panel:delete_coupon' id=coupon.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this coupon?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+                
+            </tbody>
+        </table>
+        <div class="d-grid">
+            <a href="{% url 'admin_panel:add_coupon' %}" class="btn btn-sm btn-primary mx-auto">Create Coupon</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

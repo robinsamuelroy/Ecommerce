@@ -1,0 +1,66 @@
+{% extends 'part/base.html' %}
+{% load static %}
+{% block content %}
+  <div class="modal fade" id="orderSuccessModal" tabindex="-1" role="dialog" aria-labelledby="orderSuccessModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title" id="orderSuccessModalLabel">Payment Successful!</h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-success" role="alert">
+            <strong>Success!</strong> Your order has been placed successfully. Thank you for shopping with us.
+          </div>
+          <h4 class="mt-4 mb-3">Order Details</h4>
+          <p><strong>Order ID:</strong> {{ order.order_number }}</p>
+          {% if order.discount%}
+          <p><strong>Discount:  {{ order.discount|floatformat:2 }}</strong></p>
+          {% endif%}
+          <p><strong>Order Total:</strong> ₹ {{ order.order_total|floatformat:2 }}</p>
+          <h5 class="mt-3">Order Products</h5>
+          <ul class="list-group">
+            {% for order_product in order_products %}
+              <li class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span>
+                    <strong>Product:</strong> {{ order_product.product.title }}<br>
+                    <strong>color:</strong> {{order_product.color}}<br>
+                  
+                    <strong>Quantity:</strong> {{ order_product.quantity }}<br>
+                    <strong>Price:</strong> ₹ {{ order_product.product_price|floatformat:2 }}
+                  </span>
+                  <span class="badge badge-primary badge-pill">₹{{ order_product.total_price|floatformat:2 }}</span>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closeModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+  <script>
+    function closeModal() {
+      window.location.href = '/';
+    }
+
+    $(document).ready(function() {
+      $('#orderSuccessModal').modal('show');
+
+      // Handle the close button click event
+      $('#orderSuccessModal').on('hidden.bs.modal', function () {
+        closeModal();
+      });
+    });
+  </script>
+
+{% endblock %}

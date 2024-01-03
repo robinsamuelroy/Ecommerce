@@ -1,0 +1,257 @@
+{% extends 'part/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+{% csrf_token %}
+
+    <main class="main">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="index.html" rel="nofollow">Home</a>
+                    <span></span> Shop
+                    <span></span> Your Cart
+                </div>
+            </div>
+        </div>
+        {% if not cart_items %}
+        <div class="no-products-found">
+            <h1>Your shoping cart is empty</h1>
+            <a href="{% url 'store:home' %}" class="btn mt-20 "><i class="fi-rs-shopping-bag mr-10 "></i>Continue Shopping</a>
+        </div>
+           
+        
+    {% else %}
+        <section class="mt-50 mb-50">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table shopping-summery text-center clean">
+                                <thead>
+                                    <tr class="main-heading">
+                                        <th scope="col">Image</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Price</th>
+                                        <th scope="col">Quantity</th>
+                                        <th scope="col">Subtotal</th>
+                                        <th scope="col">Remove</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        {% for cart_item in cart_items %}
+                                        <td class="image product-thumbnail"><img src="{{ cart_item.variations.image.url }}" alt="#"></td>
+                                        <td class="product-des product-name">
+                                            <h5 class="product-name"><a href="">{{ cart_item.product.product_name }}</a></h5>
+                                            <p class="font-xs">Colour:{{ cart_item.variations.color }}<br>
+                                            </p>
+                                            </p>
+                                        </td>
+                                        <td class="price" data-title="Price"><span>{{ cart_item.variations.price }} </span></td>
+                                        <td class="text-center" data-title="Stock">
+                                            <input type="hidden" value="{{ cart_item.product.pid }}" class="product_id">
+                                    <input type="hidden" value="{{ forloop.counter }}" class="item_counter">
+                                    <input type="hidden" value="{{ cart_item.id }}" class="cart_id">
+                                    <div class="input-group input-spinner">
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-primary button-minus" type="button">
+                                                <i class="fa fa-minus"></i>
+                                            </button>
+                                        </div>
+                                        <input type="text" class="form-control txt-center qty"  value="{{ cart_item.quantity }}" readonly>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary button-plus" type="button">
+                                                <i class="fa fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                        </td>
+                                        <td class="sub_total" data-title="Cart">
+                                            <span>&#x20B9;{{ cart_item.sub_total }} </span>
+                                        </td>
+                                        <td class="action" data-title="Remove"><a href="{% url 'store:remove_cart_item' pid=cart_item.product.pid cart_item_id=cart_item.id %}" class="text-muted"><i class="fi-rs-trash"></i></a></td>
+                                    </tr>
+                                    {% endfor %}
+                                    
+                            </table>
+                        </div>
+                        <div class="cart-action text-end">
+                           
+                            {% comment %} <a href="{% url 'base:index' %}"  class="btn "><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a> {% endcomment %}
+                        </div>
+                        <div class="divider center_icon mt-50 mb-50"><i class="fi-rs-fingerprint"></i></div>
+
+                            <div class="col-lg-6 col-md-12">
+                                <div class="border p-md-4 p-30 border-radius cart-totals">
+                                    <div class="heading_s1 mb-3">
+                                        <h4>Cart Totals</h4>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="total">Cart Subtotal</td>
+                                                    <td class="total" id="total"> <span class="font-lg fw-900 text-brand">{{ total }}</span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cart_total_label">Tax + Shipping</td>
+                                                    <td class=" tax"> <i class="ti-gift mr-5"></i> {{ tax }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cart_total_label">Grand Total</td>
+                                                    <td class="grand_total"><strong><span class="font-xl fw-900 text-brand">{{ grand_total }}</span></strong></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <a href="{% url 'store:checkout' %}" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+    </main>
+
+
+    <style>
+       
+    
+        .form-control {
+            width: 10%; /* Adjust the width as needed */
+            
+            background-color: white;
+            text-align: center;
+        }
+        .no-products-found {
+        text-align: center;
+        color: #12ccc0;
+        font-size: 48px;
+        margin-top: 200px; 
+        margin-bottom: 200px;
+        /* Adjust as needed to center the text vertically */
+    }
+       
+    </style>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    
+    
+    <script>
+        $(document).ready(function () {
+            var token = $('input[name=csrfmiddlewaretoken]').val();
+    
+            // Handle button clicks
+            $('.button-plus').click(function (e) {
+                e.preventDefault();
+                var $productRow = $(this).closest('tr');
+    
+                var productId = $productRow.find('.product_id').val();
+                var itemCounter = parseInt($productRow.find('.item_counter').val(), 10);
+                var cartItemId = $productRow.find('.cart_id').val();
+                var qtyInput = $productRow.find('.qty');
+                var subTotalField = $productRow.find('.sub_total');
+                var totalField = $('.total');
+                var grandTotalField = $('.grand_total');
+                var taxField = $('.tax');
+    
+                // Make an AJAX request to update the cart item quantity
+                $.ajax({
+                    method: "POST",
+                    url: "{% url 'store:newcart_update' %}",
+                    data: {
+                        'product_id': productId,
+                        'cart_id': cartItemId,
+                        'qty': qtyInput.val(),
+                        'counter': itemCounter,
+                        'csrfmiddlewaretoken': token
+                    },
+                    success: function (response) {
+                        if (response.status === "success") {
+                            qtyInput.val(response.new_quantity);
+                            subTotalField.html("₹" + response.sub_total);
+                            totalField.text("₹" + response.total);
+                            grandTotalField.text("₹" + response.grand_total);
+                            taxField.text("₹" + response.tax);
+                            console.log('Total:', response.total);
+                        } else if (response.status === "error") {
+                            alert(response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(xhr.responseText);
+                    }
+                });
+            });
+    
+            $('.button-minus').click(function (e) {
+                e.preventDefault();
+                var $productRow = $(this).closest('tr');
+    
+                var productId = $productRow.find('.product_id').val();
+                var itemCounter = parseInt($productRow.find('.item_counter').val(), 10);
+                var cartItemId = $productRow.find('.cart_id').val();
+                var qtyInput = $productRow.find('.qty');
+                var subTotalField = $productRow.find('.sub_total');
+                var totalField = $('.total');
+                var grandTotalField = $('.grand_total');
+                var taxField = $('.tax');
+    
+                // Make an AJAX request to remove the cart item
+                $.ajax({
+                    method: "POST",
+                    url: "{% url 'store:remove_cart_item_fully' %}",
+                    data: {
+                        'product_id': productId,
+                        'cart_id': cartItemId,
+                        'qty': qtyInput.val(),
+                        'counter': itemCounter,
+                        'csrfmiddlewaretoken': token
+                    },
+                    success: function (response) {
+                        if (response.status === "success") {
+                            qtyInput.val(response.new_quantity);
+                            subTotalField.html("₹" + response.sub_total);
+                            totalField.text("₹" + response.total);
+                            grandTotalField.text("₹" + response.grand_total);
+                            taxField.text("₹" + response.tax);
+                        } else {
+                            location.reload();
+                            alert(response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+
+    
+{% endblock %}
+    

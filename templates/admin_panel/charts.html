@@ -1,0 +1,370 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+
+{% block body %}
+
+
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    
+
+    <!--FontAwesome CDN-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css"
+        integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+
+    <!--Chartjs CDN-->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+
+    <!--Custome CSS-->
+    <link rel="stylesheet" href="./style.css">
+
+    <title></title>
+</head>
+
+<div >
+<div style ='height:100px'>
+
+</div>
+
+            
+     
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Dashboard </h2>
+            <p>Whole data about your business here</p>
+        </div>
+       
+    </div>
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="card card-body mb-4">
+                <article class="icontext">
+                    <span class="fas fa-users"></span>
+                    <div class="text">
+                        <h6 class="mb-1 card-title">   <span>users</h6></span>
+                        <span>{{total_users_count}}</span>
+                        <span class="text-sm">
+                           Total users
+                        </span>
+                    </div>
+                </article>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card card-body mb-4">
+                <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-success-light"><i class="text-success material-icons md-local_shipping"></i></span>
+                    <div class="text">
+                        <h6 class="mb-1 card-title">Orders</h6> <span>{{order}}</span>
+                        <span class="text-sm">
+                            Including orders in transit
+                        </span>
+                    </div>
+                </article>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card card-body mb-4">
+                <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-warning-light"><i class="text-warning material-icons md-qr_code"></i></span>
+                    <div class="text">
+                        <h6 class="mb-1 card-title">Products</h6> <span>{{product_count}}</span>
+                        <span class="text-sm">
+                            In All Categories
+                        </span>
+                    </div>
+                </article>
+            </div>
+        </div>
+      
+    </div>
+
+
+
+
+
+    <!--End Topside-->
+
+    <!--Graphs-->
+    <div class="container">
+        <div class="row my-5">
+            <div class="col-md-12" style ="margin-bottom: 110px;margin-top: 20px;">
+                <div class="bg-white">
+                    <canvas id="myChart1" width="400" height="300"></canvas>
+                    <script>
+                        var ctx = document.getElementById('myChart1').getContext('2d');
+                        var myChart1 = new Chart(ctx, {
+                            type: 'pie',
+                            data: {
+                                labels: [{% for i  in variants%} '{{ i.product.title}}', {% endfor %}],
+                                //labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                                datasets: [{
+                                    label: 'Products',
+                                    data: [{% for i  in variants%} {{ i.stock_count}}, {% endfor %}],
+                                    //data: [12, 19, 3, 5, 2, 3],
+                                    
+                                    backgroundColor: [
+                                        'rgba(255, 99, 132, 1)',
+                                        'rgba(54, 162, 235, 1)',
+                                        'rgba(255, 206, 86, 1)',
+                                        'rgba(75, 192, 192, 1)',
+                                        'rgba(153, 102, 255, 1)',
+                                        'rgba(255, 159, 64, 1)',
+                                        'rgba(255, 199, 132, 1)',
+                                        'rgba(54, 362, 235, 1)',
+                                        'rgba(255, 806, 86, 1)',
+                                        'rgba(75, 792, 192, 1)',
+                                        'rgba(153, 602, 255, 1)',
+                                        'rgba(255, 90, 64, 1)',
+                                        'rgba(25, 999, 32, 1)',
+                                        'rgba(54, 462, 35, 1)',
+                                        'rgba(55, 806, 786, 1)',
+                                        'rgba(75, 2, 92, 1)',
+                                        'rgba(15, 10, 955, 1)',
+                                        'rgba(2, 755, 664, 1)',
+                                        'rgba(882, 9, 632, 1)',
+                                        'rgba(554, 0, 835, 1)',
+                                        'rgba(999, 80, 886, 1)',
+                                        'rgba(705, 2, 492, 1)',
+                                        'rgba(103, 602, 55, 1)',
+                                        'rgba(255, 99, 132, 1)',
+                                        'rgba(54, 162, 235, 1)',
+                                        'rgba(255, 206, 86, 1)',
+                                        'rgba(75, 192, 192, 1)',
+                                        'rgba(153, 102, 255, 1)',
+                                        'rgba(255, 159, 64, 1)',
+                                        'rgba(255, 199, 132, 1)',
+                                        'rgba(54, 362, 235, 1)',
+                                        'rgba(255, 806, 86, 1)',
+                                        'rgba(75, 792, 192, 1)',
+                                        'rgba(153, 602, 255, 1)',
+                                        'rgba(255, 90, 64, 1)',
+                                        'rgba(25, 999, 32, 1)',
+                                        'rgba(54, 462, 35, 1)',
+                                        'rgba(55, 806, 786, 1)',
+                                        'rgba(75, 2, 92, 1)',
+                                        'rgba(15, 10, 955, 1)',
+                                        'rgba(2, 755, 664, 1)',
+                                        'rgba(882, 9, 632, 1)',
+                                        'rgba(554, 0, 835, 1)',
+                                        'rgba(999, 80, 886, 1)',
+                                        'rgba(705, 2, 492, 1)',
+                                        'rgba(103, 602, 55, 1)',
+                                    ],
+                                    borderColor: [
+                                        'rgba(255, 99, 132, 1)',
+                                        'rgba(54, 162, 235, 1)',
+                                        'rgba(255, 206, 86, 1)',
+                                        'rgba(75, 192, 192, 1)',
+                                        'rgba(153, 102, 255, 1)',
+                                        'rgba(255, 159, 64, 1)',
+                                        'rgba(255, 199, 132, 1)',
+                                        'rgba(54, 362, 235, 1)',
+                                        'rgba(255, 806, 86, 1)',
+                                        'rgba(75, 792, 192, 1)',
+                                        'rgba(153, 602, 255, 1)',
+                                        'rgba(255, 90, 64, 1)',
+                                        'rgba(25, 999, 32, 1)',
+                                        'rgba(54, 462, 35, 1)',
+                                        'rgba(55, 806, 786, 1)',
+                                        'rgba(75, 2, 92, 1)',
+                                        'rgba(15, 10, 955, 1)',
+                                        'rgba(2, 775, 664, 1)',
+                                        'rgba(882, 9, 632, 1)',
+                                        'rgba(554, 0, 835, 1)',
+                                        'rgba(999, 80, 886, 1)',
+                                        'rgba(705, 2, 492, 1)',
+                                        'rgba(103, 602, 55, 1)',
+                                        'rgba(255, 99, 132, 1)',
+                                        'rgba(54, 162, 235, 1)',
+                                        'rgba(255, 206, 86, 1)',
+                                        'rgba(75, 192, 192, 1)',
+                                        'rgba(153, 102, 255, 1)',
+                                        'rgba(255, 159, 64, 1)',
+                                        'rgba(255, 199, 132, 1)',
+                                        'rgba(54, 362, 235, 1)',
+                                        'rgba(255, 806, 86, 1)',
+                                        'rgba(75, 792, 192, 1)',
+                                        'rgba(153, 602, 255, 1)',
+                                        'rgba(255, 90, 64, 1)',
+                                        'rgba(25, 999, 32, 1)',
+                                        'rgba(54, 462, 35, 1)',
+                                        'rgba(55, 806, 786, 1)',
+                                        'rgba(75, 2, 92, 1)',
+                                        'rgba(15, 10, 955, 1)',
+                                        'rgba(2, 775, 664, 1)',
+                                        'rgba(882, 9, 632, 1)',
+                                        'rgba(554, 0, 835, 1)',
+                                        'rgba(999, 80, 886, 1)',
+                                        'rgba(705, 2, 492, 1)',
+                                        'rgba(103, 602, 55, 1)',
+                                    ],
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: true
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    </script>
+                </div>
+            </div>
+
+            <div class="col-md-12" style ="margin-bottom: 110px;margin-top: 20px;">
+                <div class="bg-white">
+                    <canvas id="myChart2" width="400" height="300"></canvas>
+                    <script>
+                        var ctx = document.getElementById('myChart2').getContext('2d');
+                        var myChart2 = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: [{% for i  in months%} '{{ i }}', {% endfor %}],
+                                //labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                                datasets: [{
+                                    label: 'sales by month',
+                                    data: [{% for i  in totals%} {{ i}}, {% endfor %}],
+                                    //data: [12, 19, 3, 5, 2, 3],
+                                    
+                                    backgroundColor: [
+                                        'rgba(255, 99, 132, 1)',
+                                        'rgba(54, 162, 235, 1)',
+                                        'rgba(255, 206, 86, 1)',
+                                        'rgba(75, 192, 192, 1)',
+                                        'rgba(153, 102, 255, 1)',
+                                        'rgba(255, 159, 64, 1)',
+                                        'rgba(255, 199, 132, 1)',
+                                        'rgba(54, 362, 235, 1)',
+                                        'rgba(255, 806, 86, 1)',
+                                        'rgba(75, 792, 192, 1)',
+                                        'rgba(153, 602, 255, 1)',
+                                        'rgba(255, 90, 64, 1)',
+                                        'rgba(25, 999, 32, 1)',
+                                        'rgba(54, 462, 35, 1)',
+                                        'rgba(55, 806, 786, 1)',
+                                        'rgba(75, 2, 92, 1)',
+                                        'rgba(15, 10, 955, 1)',
+                                        'rgba(2, 755, 664, 1)',
+                                        'rgba(882, 9, 632, 1)',
+                                        'rgba(554, 0, 835, 1)',
+                                        'rgba(999, 80, 886, 1)',
+                                        'rgba(705, 2, 492, 1)',
+                                        'rgba(103, 602, 55, 1)',
+                                        'rgba(255, 99, 132, 1)',
+                                        'rgba(54, 162, 235, 1)',
+                                        'rgba(255, 206, 86, 1)',
+                                        'rgba(75, 192, 192, 1)',
+                                        'rgba(153, 102, 255, 1)',
+                                        'rgba(255, 159, 64, 1)',
+                                        'rgba(255, 199, 132, 1)',
+                                        'rgba(54, 362, 235, 1)',
+                                        'rgba(255, 806, 86, 1)',
+                                        'rgba(75, 792, 192, 1)',
+                                        'rgba(153, 602, 255, 1)',
+                                        'rgba(255, 90, 64, 1)',
+                                        'rgba(25, 999, 32, 1)',
+                                        'rgba(54, 462, 35, 1)',
+                                        'rgba(55, 806, 786, 1)',
+                                        'rgba(75, 2, 92, 1)',
+                                        'rgba(15, 10, 955, 1)',
+                                        'rgba(2, 755, 664, 1)',
+                                        'rgba(882, 9, 632, 1)',
+                                        'rgba(554, 0, 835, 1)',
+                                        'rgba(999, 80, 886, 1)',
+                                        'rgba(705, 2, 492, 1)',
+                                        'rgba(103, 602, 55, 1)',
+                                    ],
+                                    borderColor: [
+                                        'rgba(255, 99, 132, 1)',
+                                        'rgba(54, 162, 235, 1)',
+                                        'rgba(255, 206, 86, 1)',
+                                        'rgba(75, 192, 192, 1)',
+                                        'rgba(153, 102, 255, 1)',
+                                        'rgba(255, 159, 64, 1)',
+                                        'rgba(255, 199, 132, 1)',
+                                        'rgba(54, 362, 235, 1)',
+                                        'rgba(255, 806, 86, 1)',
+                                        'rgba(75, 792, 192, 1)',
+                                        'rgba(153, 602, 255, 1)',
+                                        'rgba(255, 90, 64, 1)',
+                                        'rgba(25, 999, 32, 1)',
+                                        'rgba(54, 462, 35, 1)',
+                                        'rgba(55, 806, 786, 1)',
+                                        'rgba(75, 2, 92, 1)',
+                                        'rgba(15, 10, 955, 1)',
+                                        'rgba(2, 775, 664, 1)',
+                                        'rgba(882, 9, 632, 1)',
+                                        'rgba(554, 0, 835, 1)',
+                                        'rgba(999, 80, 886, 1)',
+                                        'rgba(705, 2, 492, 1)',
+                                        'rgba(103, 602, 55, 1)',
+                                        'rgba(255, 99, 132, 1)',
+                                        'rgba(54, 162, 235, 1)',
+                                        'rgba(255, 206, 86, 1)',
+                                        'rgba(75, 192, 192, 1)',
+                                        'rgba(153, 102, 255, 1)',
+                                        'rgba(255, 159, 64, 1)',
+                                        'rgba(255, 199, 132, 1)',
+                                        'rgba(54, 362, 235, 1)',
+                                        'rgba(255, 806, 86, 1)',
+                                        'rgba(75, 792, 192, 1)',
+                                        'rgba(153, 602, 255, 1)',
+                                        'rgba(255, 90, 64, 1)',
+                                        'rgba(25, 999, 32, 1)',
+                                        'rgba(54, 462, 35, 1)',
+                                        'rgba(55, 806, 786, 1)',
+                                        'rgba(75, 2, 92, 1)',
+                                        'rgba(15, 10, 955, 1)',
+                                        'rgba(2, 775, 664, 1)',
+                                        'rgba(882, 9, 632, 1)',
+                                        'rgba(554, 0, 835, 1)',
+                                        'rgba(999, 80, 886, 1)',
+                                        'rgba(705, 2, 492, 1)',
+                                        'rgba(103, 602, 55, 1)',
+                                    ],
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: true
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</section></div>
+    <!--End Graphs-->
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
+        crossorigin="anonymous"></script>
+
+
+
+
+{% endblock body %}

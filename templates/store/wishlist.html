@@ -1,0 +1,155 @@
+{% extends 'part/base.html' %}
+{% load static %}
+{% block content %}
+
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html" rel="nofollow">Home</a>
+                <span></span> Shop
+                <span></span> Wishlist
+            </div>
+        </div>
+    </div>
+
+    <section class="mt-50 mb-50">
+        <div class="container">
+            {% if not wishlist %}
+                <div id="inside-div">
+                    <h2 class="text-center">Your Shopping Wishlist is Empty</h2>
+                    <br>
+                    <div class="text-center">
+                        <a href="{% url 'store:home' %}" class="btn btn-primary">Continue Shopping</a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="row">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table shopping-summery text-center">
+                                <thead>
+                                    <tr class="main-heading">
+                                        <th scope="col" colspan="2">Product</th>
+                                        <th scope="col">Price</th>
+                                        <th scope="col">Action</th>
+                                        <th scope="col">Remove</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in wishlist %}
+                                        <tr>
+                                            <td class="image product-thumbnail"><img src="{{ item.product.image.url }}" alt="#"></td>
+                                            <td class="product-des product-name">
+                                                <h5 class="product-name">
+                                                    <a href="{% url 'store:product-detail' item.product.pid %}">{{ item.product.title| linebreaksbr }}</a>
+                                                </h5>
+                                                <p class="font-xs">{{ item.product.description }}</p>
+                                            </td>
+                                            <td class="price" data-title="Price"><span>{{ item.product.price }}</span></td>
+                                            <td class="text-right" data-title="Cart">
+                                                <a href="{% url 'store:product-detail' item.product.pid %}">
+                                                    <button class="btn btn-sm">
+                                                        <i class="fi-rs-shopping-bag mr-5"></i>View Options
+                                                    </button>
+                                                </a>
+                                            </td>
+                                            <td class="action" data-title="Remove">
+                                                <!-- Add a hidden field to store the product ID -->
+                                                <input type="hidden" class="product-id" value="{{ item.product.pid }}">
+                                                <a class="custom-remove-btn" href="#" data-product-id="{{ item.product.pid }}"><i class="fi-rs-trash"></i></a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+</main>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    var removeButtons = document.querySelectorAll('.custom-remove-btn');
+
+    removeButtons.forEach(function (button) {
+        button.addEventListener('click', function (event) {
+            event.preventDefault();
+
+            // Get the product ID from the data attribute
+            var productId = this.getAttribute('data-product-id');
+            console.log('Clicked remove button for product ID:', productId);
+
+            // Reference to the parent row element
+            var productRow = this.closest('tr');
+
+            // AJAX request to remove the product from the wishlist
+            fetch(
+                `{% url 'store:remove_from_wishlist' 0 %}`.replace('0', productId), {
+                method: 'DELETE',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+            })
+            .then(response => {
+                // Check if the response is a valid JSON
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Network response was not ok.');
+                }
+            })
+            .then(data => {
+                if (data.success) {
+                    // Item removed successfully
+                    // Remove the product row from the UI
+                    productRow.remove();
+
+                    // Display a success message
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Product removed from your wishlist.',
+                        showConfirmButton: false,
+                        timer: 2000  // Auto-close after 2 seconds
+                    });
+
+                    // Optionally, you can perform additional actions here
+                    // ...
+
+                } else {
+                    // Display an error message
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Failed to remove the product from your wishlist. Please try again.',
+                        showConfirmButton: false,
+                        timer: 2000  // Auto-close after 2 seconds
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Display an error message
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Failed to remove the product from your wishlist. Please try again.',
+                    showConfirmButton: false,
+                    timer: 2000  // Auto-close after 2 seconds
+                });
+            });
+        });
+    });
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends 'part/base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-content padding-y bg">
+
+<div class="container">
+	<div class="row">
+	<aside class="col-md-3">
+		<!--   SIDEBAR   -->
+		<ul class="list-group">
+			<a class="list-group-item " href="{% url 'store:profile' %}">My Profile</a>
+			<a class="list-group-item" href="{% url 'store:user_address' %}"> My Address </a>
+			<a class="list-group-item active" href="{% url 'store:user_dashboard' %}"> My Orders </a>
+			<a class="list-group-item list-group-item-action" href="{% url 'store:wallet' %}"><i class="fas fa-shopping-bag mr-2"></i> wallet</a>
+			{% comment %} <a class="list-group-item list-group-item-action" href="{% url 'store:wallet' %}">wallet</a> {% endcomment %}
+			<!--<a class="list-group-item" href="#"> Return and refunds </a>
+			<a class="list-group-item" href="#">Settings </a>
+			<a class="list-group-item" href="#"> My Selling Items </a>
+			<a class="list-group-item" href="#"> Received orders </a>
+		</ul>
+		<br>
+		 <a class="btn btn-light btn-block mb-2" href="{% url 'accounts:logout' %}"> <i class="fa fa-power-off"></i> <span class="text">Log out</span> </a> 
+		<!--   SIDEBAR .//END   -->
+	</aside>
+	<main class="col-md-9" style="background-color: #f5f5f5; padding: 20px; min-height: 500px;"> <!-- Increase min-height to make body visible -->
+		
+		<article class="card">
+		<header class="card-header">
+			<strong class="d-inline-block mr-3">Your Orders</strong>
+		</header>
+		<div class="card-body" style="padding: 20px;"> <!-- Increase padding to make content larger -->
+			<div class="row"> 
+				<div class="col-md-12">
+					<table class="table table-hover">
+                        <thead>
+                          <tr>
+                            <th scope="col">Order #</th>
+                            <th scope="col">Order Status</th>
+                            <th scope="col">Order Total</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Action</th>
+							<th scope="col">Details</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr>
+                            <th scope="row">{{ order.order_number }}</th> <!-- Corrected to 'order' -->
+                            <td>{{ order.status }}</td>
+                            <td>{{ order.order_total }}</td>
+                            <td>{{ order.created_at }}</td>
+                            <td>
+                           
+								
+						{% if order.status == 'Completed' %}
+						<a href="{% url 'store:return_order' order_id=order.id %}" class="btn btn-warning" onclick="return confirm('Are you sure you want to return this order?')">Return</a>
+					{% elif order.status != 'Rejected' %}
+						{% if order.status != 'Cancelled' and order.status != 'cancelled' %}
+						<a href="{% url 'store:cancel_order_product' order_id=order.id %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this order?')">Cancel</a>
+						{% endif %}
+					{% endif %}
+                            
+                            
+                            </td>
+							<td>
+								<a href="{% url 'store:order_details' order.id %}" class="btn btn-primary" > Details</a> 
+						  	</td>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+				</div>
+			</div> <!-- row.// -->
+		</div> <!-- card-body .// -->
+		<div class="table-responsive">
+		</div> <!-- table-responsive .end// -->
+		</article> <!-- order-group.// --> 
+	</main>
+</div> <!-- row.// -->
+</div>
+
+
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+<script>
+	function confirmCancellation() {
+		return confirm("Are you sure you want to cancel this order?");
+	}
+</script>
+
+{% endblock %}

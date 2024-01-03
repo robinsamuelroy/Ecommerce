@@ -1,4 +1,6 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
+from django.db import transaction
+from store.models import *
 from .forms import UserRegisterForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
@@ -7,7 +9,7 @@ from django.core.mail import send_mail
 from django.contrib.auth.hashers import make_password
 from django.views.decorators.cache import never_cache
 from django.views.decorators.cache import cache_control
-from django.http import HttpResponseRedirect,HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseRedirect,HttpResponseBadRequest
 from django.urls import reverse
 from accounts.models import Account  # Import your custom user model
 
@@ -168,3 +170,94 @@ def reset_password_confirm(request):
         messages.success(request, 'Password reset successfully. You can now log in with your new password.')
         return redirect('accounts:login')
     return render(request, 'accounts/reset_password_confirm.html')
+
+
+
+# views.py
+
+@never_cache
+def resend_otp(request):
+    if request.method == 'POST':
+        email = request.session.get('reset_email')
+        if email:
+            otp = ''.join([str(random.randint(0, 9)) for _ in range(4)])  # Generate new OTP
+            request.session['reset_otp'] = otp
+            send_mail(
+                "Reset Password OTP (Resend)",
+                f"Your new OTP for resetting the password: {otp}",
+                'djangoalerts0011@gmail.com',
+                [email],
+                fail_silently=False
+            )
+            messages.success(request, 'New OTP sent. Please check your email.')
+            return redirect('accounts:verify_otp')  # Redirect back to OTP verification page
+        else:
+            messages.error(request, 'No email associated with OTP request.')
+            return redirect('accounts:reset_password')  # Redirect to the password reset page
+    
+    # Render the 'verify_otp.html' template with the resend OTP form
+    return render(request, 'accounts/verify_otp.html')
+
+
+
+##############################################################################################################################
+
+@transaction.atomic
+def confirm_razorpay_payment(request, order_number):
+    
+    current_user = request.user
+    try:
+        order = Order.objects.get(order_number=order_number, user=current_user, is_ordered=False)
+    except Order.DoesNotExist:
+        return HttpResponse("Order not found")
+        
+    
+    total_amount = order.order_total 
+
+
+    payment = Payment.objects.create(
+        user=current_user,
+        payment_method="Razorpay",
+        status="Paid",
+        amount_paid=total_amount,
+    )
+    print("razorpay")
+
+    order.payment = payment
+    order.save() 
+    cp=request.session.get('coupon_code')
+    if cp is not None:
+     ns=Coupon.objects.get(code=cp)
+     reddemcoupon= RedeemedCoupon.objects.filter(user=request.user,coupon=ns,is_redeemed=False)
+     reddemcoupon.is_redeemed=True
+     reddemcoupon.update(is_redeemed=True)
+     del request.session['coupon_code']
+             
+             
+
+            
+    cart_items = CartItem.objects.filter(user=request.user, is_active=True)
+            
+      # Access the related varients instance
+     # Update the stock for the varients
+    for item in cart_items:
+                orderproduct = OrderProduct()
+                item.variations.stock_count-=item.quantity
+                item.variations.save()
+                orderproduct.order = order
+                orderproduct.payment = payment
+                orderproduct.user = request.user
+                orderproduct.product = item.product
+                orderproduct.quantity = item.quantity
+                orderproduct.product_price = item.variations.price
+                orderproduct.ordered = True
+                orderproduct.color = item.variations.color
+                orderproduct.save()
+
+
+                # Update the product's quantity or perform any other necessary updates
+    cart_items.delete()
+           
+    return redirect("store:order_success", id=order.id)        
+
+

@@ -1,0 +1,57 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+{% block title %} Add category {% endblock %}
+{% block  body %}
+<section class="content-main">
+    <div class="row">
+        <div class="col-lg-9">
+            <div class="content-header">
+                <h2 class="content-title">Add New category</h2>
+                {% if error_messages %}
+                    <div class="alert alert-danger">
+                        <ul>
+                            {% for error_message in error_messages %}
+                                <li>{{ error_message }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Add Category fields</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'admin_panel:admin_add_category'  %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% if messages %}
+                            <div class="messages">
+                                {% for message in messages %}
+                                    <div class="{% if message.tags %}alert alert-{{ message.tags }}{% endif %}">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="mb-3">
+                            <label for="product_name" class="form-label">Category Name</label>
+                            <input type="text" placeholder="Type here" class="form-control" id="product_name" name="category_name"/>
+                        </div>
+                        <div class="mb-3">
+                            <label for="category_image" class="form-label">Image</label>
+                            <input class="form-control" type="file" required="True" name="category_image">
+                        </div>
+                        <div class="d-grid mb-3">
+                            <button class="btn btn-primary">Create category</button>
+                            <br>
+                            <a href="{% url 'admin_panel:admin_category_list' %}" class="btn btn-secondary">Category List</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section> 
+{% endblock %}

@@ -8,7 +8,7 @@ from django.db.models import Q
 class UserManager(BaseUserManager):
   def create_user(self,first_name,last_name,username,email,password=None):
     if not email:
-      raise ValueError('User must an email address')
+      raise ValueError('User must have an email address')
     
     if not username:
       raise ValueError('User must have a username')
@@ -85,14 +85,14 @@ class Account(AbstractBaseUser,PermissionsMixin):
 
 
 
-class Userform(models.Model):
-  # user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
-  username = models.CharField(null=True, max_length=100)
-  email = models.EmailField(null=True)
-  password = models.CharField(null=True, max_length=255)
+# class Userform(models.Model):
+#   # user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
+#   username = models.CharField(null=True, max_length=100)
+#   email = models.EmailField(null=True)
+#   password = models.CharField(null=True, max_length=255)
 
-  def __str__(self):
-    return self.username
+#   def __str__(self):
+#     return self.username
   
   
   

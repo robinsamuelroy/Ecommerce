@@ -1,4 +1,4 @@
-{% extends 'part/base.html' %}
+{% extends 'admin_panel/base.html' %}
 {% load static %}
 {% block title %} Add product {% endblock %}
 {% block  body %}
@@ -35,7 +35,7 @@
                             
                                 <div class="mb-4">
                                     <label for="{{form.title.id_for_label}}" class="form-label">Product name</label>
-                                    <input placeholder="Product name" type="text" class="form-control" name="title" required="True">
+                                    <input placeholder="Product name" type="text" class="form-control" name="title" required="True" value="{{ form_data.title }}">
                                    
                                     <div class="row gx-2">
                                          
@@ -45,31 +45,33 @@
                             <div class="col-lg-6">
                                 <div class="mb-4">
                                     <label for="{{form.stock_count.id_for_label}}" class="form-label">Stock Count </label>
-                                    <input placeholder="Stock Count" type="text" class="form-control" name="stock_count" required="True" min="0">
+                                    <input placeholder="Stock Count" type="text" class="form-control" name="stock_count" required="True" min="0" value="{{ form_data.stock_count }}">
                                     
                                 </div>
                             </div>
                         </div>
                         <div class="mb-4">
                             <label for="{{form.description.id_for_label}}" class="form-label">Description</label>
-                            <textarea placeholder="Type here" class="form-control" rows="4" name="description"></textarea>
+                            <textarea placeholder="Type here" class="form-control" rows="4" name="description">{{ form_data.description }}</textarea>
                         </div>
-                        <div class="row">
+
+                       
+             
                             <div class="col-lg-6">
                                 <div class="mb-4">
                                     <label for="{{form.old_price.id_for_label}}" class="form-label">Max price</label>
                                     <div class="row gx-2">
-                                        <input placeholder="$" type="text" class="form-control" name="old_price" required="True" min="0">
+                                        <input placeholder="$" type="text" class="form-control" name="old_price" required="True" min="0" value="{{ form_data.old_price }}">
                                     </div>
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="mb-4">
                                     <label for="{{form.price.id_for_label}}" class="form-label">price</label>
-                                    <input placeholder="$" type="text" class="form-control" name="price" required="True" min="0">
+                                    <input placeholder="$" type="text" class="form-control" name="price" required="True" min="0" value="{{ form_data.price }}">
                                 </div>
                             </div>
-                        </div>  
+                        </div>   
                         
                 </div>
             </div> <!-- card end// -->
@@ -82,7 +84,8 @@
                                 <div class="card-body">
                                     <div class="input-upload">
                                         <label for="{{ form.image.id_for_label }}">Image</label>
-                                        <input class="form-control" type="file" required="True" name="image_feild">
+                                        <input id="mainImageInput" class="form-control" type="file" required="True" name="image_feild">
+                                        <img id="mainImagePreview" src="#" alt="Main Image Preview" style="max-width: 100%; height: auto; display: none;">
                                     </div>
                                 </div>
                             </div> <!-- card end// -->
@@ -106,12 +109,13 @@
                                             <div class="card-header">
                                                 <h4>Additional Images</h4>
                                             </div>
-                                            <div class="card-body">
+                                            <div class="card-body" id="additionalImages">
                                                 {% for i in additional_image_count %}
-                                                    <div class="input-upload">
-                                                        <label for="product_image{{ i }}">Product Image {{ i }}</label>
-                                                        <input class="form-control" type="file" name="product_image{{ i }}">
-                                                    </div>
+                                                <div class="input-upload">
+                                                    <label for="product_image{{ i }}">Product Image {{ i }}</label>
+                                                    <input id="product_image{{ i }}" class="form-control" type="file" name="product_image{{ i }}">
+                                                    <img id="productImagePreview{{ i }}" src="#" alt="Product Image {{ i }}" style="max-width: 100%; height: auto; display: none;">
+                                                </div>
                                                 {% endfor %}
                                             </div>
                                         </div>
@@ -129,6 +133,46 @@
         </form>
         </div>
     </div>
-</section> 
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/cropperjs"></script>
+
+<script>
+    function previewImage(input, preview) {
+        const file = input.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // Preview main image
+    const mainImageInput = document.getElementById('mainImageInput');
+    const mainImagePreview = document.getElementById('mainImagePreview');
+    mainImageInput.addEventListener('change', function () {
+        previewImage(this, mainImagePreview);
+    });
+
+    // Function to add additional image previews
+    function addProductImagePreview(input, preview) {
+        input.addEventListener('change', function () {
+            previewImage(this, preview);
+        });
+    }
+
+    // Add event listeners for additional image inputs and their respective previews
+    {% for i in additional_image_count %}
+        const productImage{{ i }} = document.getElementById('product_image{{ i }}');
+        const productImagePreview{{ i }} = document.getElementById('productImagePreview{{ i }}');
+        addProductImagePreview(productImage{{ i }}, productImagePreview{{ i }});
+    {% endfor %}
+</script>
+
+
+
 
 {% endblock %}

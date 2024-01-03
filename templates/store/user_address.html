@@ -1,0 +1,80 @@
+{% extends 'part/base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-conten padding-y bg">
+
+<div class="container">
+	<div class="row">
+	<aside class="col-md-3">
+		<!--   SIDEBAR   -->
+		<ul class="list-group">
+			<a class="list-group-item" href="{% url 'store:user_dashboard' %}">My Profile</a>
+			<a class="list-group-item active" href="{% url 'store:user_address' %}"> My Address </a>
+			<a class="list-group-item" href="{% url 'store:user_dashboard' %}"> My Orders </a>
+            {% comment %} <a class="list-group-item list-group-item-action" href="{% url 'orders:wallet' %}">wallet</a> {% endcomment %}
+			<!--<a class="list-group-item" href="#"> Return and refunds </a>
+			<a class="list-group-item" href="#">Settings </a>
+			<a class="list-group-item" href="#"> My Selling Items </a>
+			<a class="list-group-item" href="#"> Received orders </a>-->
+		</ul>
+		<br>
+		<a class="btn btn-light btn-block mb-2" href="#"> <i class="fa fa-power-off"></i> <span class="text">Log out</span> </a> 
+		<!--   SIDEBAR .//END   -->
+	</aside>
+	<div class="container">
+        <div class="row">
+            <article class="card">
+                <header class="card-header">
+                    <h5>Manage Addresses</h5>
+                    <a href="{% url 'store:add_address' %}" class="btn btn-primary mb-3">Add Address</a>
+                </header>
+            
+               
+
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>First Name</th>
+                            <th>last Name</th>
+                            <th>email</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                            {% comment %} <th>address_2</th> {% endcomment %}
+                            <th>City</th>
+                            <th>State</th>
+                            {% comment %} <th>Postal Code</th> {% endcomment %}
+                            <th>Country</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for address in addresses %}
+                        <tr>
+                            <td>{{ address.first_name }}</td>
+                            <td>{{ address.last_name }}</td>
+                            <td>{{ address.email }}</td>
+                            <td>{{ address.phone }}</td>
+                            <td>{{ address.address_line_1 }}</td>
+                            {% comment %} <td>{{ address.address_line_2 }}</td> {% endcomment %}
+                            <td>{{ address.city }}</td>
+                            <td>{{ address.state }}</td>
+                            <td>{{ address.country }}</td>
+                            <td>
+                                <a href="{% url 'store:edit_address' address.id %}" class="btn btn-sm btn-primary">Edit</a>
+                                <a href="{% url 'store:delete_address' address.id %}" class="btn btn-sm btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </article>
+</div><!-- row.// -->
+
+
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+
+
+{% endblock %}

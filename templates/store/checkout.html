@@ -1,0 +1,393 @@
+
+{% extends 'part/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+
+
+<section class="section-content padding-y bg mb-20 mt-20">
+  <div class="container">
+  
+  <!-- ============================ COMPONENT 1 ================================= -->
+  <div class="row">
+      <aside class="col-lg-6">
+         
+          <div class="card">
+              <div class="card-body">
+                  <h4 class="card-title mb-4">Billing Address</h4>
+                  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addAddressModal">
+                    Add Address
+                </button>
+
+
+                <div class="modal fade" id="addAddressModal" tabindex="-1" role="dialog" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="addAddressModalLabel">Add Address</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST" action=# id="addAddressForm">
+                                    {% csrf_token %}
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="first_name">First Name</label>
+                                            <input type="text" class="form-control" id="first_name" name="first_name" required maxlength="100">
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="last_name">Last Name</label>
+                                            <input type="text" class="form-control" id="last_name" name="last_name" required maxlength="100">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="email">Email</label>
+                                            <input type="email" class="form-control" id="email" name="email" required maxlength="100">
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="phone">Phone</label>
+                                            <input type="tel" class="form-control" id="phone" name="phone"  required maxlength="10">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="address_line_1">Address</label>
+                                        <input type="text" class="form-control" id="address_line_1" name="address_line_1" required maxlength="100">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="address_line_2">Address</label>
+                                        <input type="text" class="form-control" id="address_line_2" name="address_line_2" required maxlength="100">
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="postal_code">Postalcode</label>
+                                            <input type="text" class="form-control" id="postal_code" name="postal_code" required maxlength="10">
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="city">City</label>
+                                            <input type="text" class="form-control" id="city" name="city" required maxlength="50">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-4">
+                                            <label for="state">State</label>
+                                            <input type="text" class="form-control" id="state" name="state" required maxlength="50">
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                            <label for="country">Country</label>
+                                            <input type="text" class="form-control" id="country" name="country" required maxlength="50">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Add Address</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Include Bootstrap and jQuery -->
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+                <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+                
+                  <form method="POST" action="{% url 'store:place_order' %}">
+                      {% csrf_token %}
+                  <div class="form-row">
+                      <label for="selected_address">Select Address:</label>
+                      <select name="selected_address" id="selected_address" class="form-control">
+                          {% for address in addresses %}
+                              <option value="{{ address.id }}">{{ address.address_line_1 }} {{ address.city }}</option>
+                          {% endfor %}
+                      </select>
+                      <div class="card mt-4">
+                        <div class="card-body">
+                            <h4 class="card-title mb-4">Coupons</h4>
+                            <div class="form-group">
+                                <select name="coupon_code" id="coupon-code-select" class="form-control">
+                                    
+                                    <option value="" selected disabled>Select a Coupon</option>
+                                    {% for coupon in coupons %}
+                                    <option value="{{ coupon.code }}">
+                                        <strong>{{ coupon.code }}</strong> - {{ coupon.description }}<br>__
+                                        Discount: {{ coupon.discount }}%<br>__
+                                        Purchase Range: ₹{{ coupon.minimum_purchase_value }} to ₹{{ coupon.maximum_purchase_value }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-primary text-white py-1 px-3 mt-2" id="apply-coupon-btn">Apply Coupon</button>
+                            <button type="button" class="btn btn-primary text-white py-1 px-3 mt-2" id="remove-coupon-btn" >Remove</button>
+                        </div>
+                    </div>
+                   
+                </div>
+             </div>
+                    
+          
+      </aside> <!-- col.// -->
+      <aside class="col-lg-6">
+          <div class="card">
+              <div class="card-body">
+                  <table class="table table-borderless table-shopping-cart">
+                      <thead class="text-muted">
+                          <tr class="small text-uppercase">
+                              <th scope="col">Product</th>
+                              <th scope="col" width="120">Quantity</th>
+                              <th scope="col" width="120">Price</th>
+                          </tr>
+                          
+                      </thead>
+                      <tbody>
+                          {% for cart_item in cart_items %}
+                          <tr>
+                              <td>
+                                  <figure class="itemside align-items-center">
+                                      <div class="aside"><img src="{{ cart_item.variations.image.url }}" class="img-sm"></div>
+                                      <figcaption class="info">
+                                          <a href="{{ cart_item.variations.get_url }}" class="title text-dark">{{ cart_item.product.title }}</a>
+                                          <p class="text-muted small"><br> 
+                                          {% if cart_items.variations.all %}
+                                          {% for item in cart_items.variations.all %}
+                                          Product Type : {{ item.variation_value}}
+                                          {% endfor %}
+                                          {% endif %}
+                                          </p>
+                                      </figcaption>
+                                  </figure>
+                              </td>
+                              <td> 
+                                  <!-- col.// -->
+                                  <label >{{ cart_item.quantity}}</label>
+                              </td>
+                              <td> 
+                                  <div class="price-wrap"> 
+                                      <var class="price">Price:₹ {{ cart_item.variations.price }}</var> 
+
+                                    </div> 
+
+
+                                      <div class="additional-info">
+                                       
+                                        
+                                    </div>
+
+
+                                  <!-- price-wrap .// -->
+                              </td>
+                          </tr>
+                          {% endfor %}
+                          <tr>
+                              <td colspan="2"></td>
+                              <td>
+                                  <div class="price-wrap"> 
+                                   
+                                    <p>Total: ₹ {{ total }}</p><br>
+                                    
+                                    <p>Tax: ₹ {{ tax }}</p> <br>
+                                    <span id="coupon-discount-display"></span><br>
+                                      <var class="price" id="grand-total">Grand Total: ₹{{ grand_total }}</var> 
+                                  </div>
+                              </td>
+                          </tr>
+                      </tbody>
+                  </table>
+                  <button type="submit" name="action" value="proceedtopay" class="btn btn-light btn-block mt-10">Proceed to Pay</button>
+                  <a href="{% url 'store:home' %}" class="btn btn-light btn-block mt-10 ml-auto ">Continue Shopping</a>
+                  </form>
+                  
+              
+              </div> <!-- card-body.// -->
+          </div> <!-- card.// -->
+      </aside> <!-- col.// -->
+  </div> <!-- row.// -->
+  <!-- ============================ COMPONENT 1 END .// ================================= -->
+  </div> <!-- container .//  -->
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+
+
+
+
+<style>
+    price-wrap {
+    display: flex;
+    flex-direction: column;
+}
+
+.price,
+.additional-info{
+    margin-top: 10px; /* Adjust as needed */
+}
+</style>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.elevatezoom.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+    $(document).ready(function () {
+        // Function to apply the coupon
+        $('#remove-coupon-btn').hide();
+        $('#apply-coupon-btn').click(function () {
+            var selectedCoupon = $('#coupon-code-select').val();  // Get the selected coupon code
+
+            if (!selectedCoupon) {
+                alert('Please select a coupon before applying.');
+                return;
+            }
+
+            var token = $('[name="csrfmiddlewaretoken"]').val();
+            var grandTotal = '{{ grand_total }}';
+
+            console.log("Coupon Code:", selectedCoupon);
+            console.log("Token:", token);
+            console.log("Grand Total:", grandTotal);
+
+            $.ajax({
+                method: 'POST',
+                url: '{% url "store:apply_coupon" %}',
+                data: {
+                    'csrfmiddlewaretoken': token,
+                    'coupon_code': selectedCoupon,
+                    'grand_total': grandTotal
+                },
+                success: function (response) {
+                    if (response.status === 'success') {
+                        console.log("coupon", response.coupon_discount);
+                        // Update coupon discount and other relevant UI elements
+                        updateDiscountUI(response.coupon_discount);
+                        Swal.fire('Success', 'Coupon applied successfully.', 'success');
+                        $('#apply-coupon-btn').hide();
+                        $('#remove-coupon-btn').show();
+                    } else {
+                        alert(`Error: ${response.message}`);
+                    }
+                },
+                error: function () {
+                    alert('An error occurred while applying the coupon.');
+                }
+            });
+        });
+
+        // Function to remove the applied coupon
+        $('#remove-coupon-btn').click(function () {
+            // Reset UI elements and remove coupon data from the session
+            resetDiscountUI();
+
+            // Make an AJAX request to remove coupon data from the session on the server side
+            var grandTotal = parseFloat('{{ grand_total }}');
+
+            $.ajax({
+                method: 'POST',
+                url: '{% url "store:remove_coupon" %}',
+                data: {
+                    'csrfmiddlewaretoken': $('[name="csrfmiddlewaretoken"]').val(),
+                    'grand_total': grandTotal,  // Pass grand_total as part of the data
+                },
+                success: function (response) {
+                    if (response.status === 'success') {
+                        Swal.fire('Success', 'Coupon removed successfully.', 'success');
+                        $('#apply-coupon-btn').show();
+                        $('#remove-coupon-btn').hide();
+                    } else {
+                        alert('No coupon applied.');
+                    }
+                },
+                error: function () {
+                    alert('An error occurred while removing the coupon.');
+                }
+            });
+        });
+
+        // Function to update UI elements with the discount value
+        function updateDiscountUI(discount) {
+            $('#coupon-discount').text('$' + discount);
+            $('#coupon-discount-display').text(' Discount: ₹' + discount.toFixed(2));
+            updateFinalTotalUI(discount);
+        }
+
+        // Function to reset UI elements to their initial state
+        function resetDiscountUI() {
+            $('#coupon-discount').text('$0');
+            $('#coupon-discount-display').text(' Discount: ₹0.00');
+            updateFinalTotalUI(0);
+        }
+
+        // Function to update the final total UI element
+        function updateFinalTotalUI(discount) {
+            var grandTotal = parseFloat('{{ grand_total }}');
+            var finalTotal = grandTotal - discount;
+            $('#final-total').text('$' + finalTotal);
+            $('#grand-total').text('Grand Total ₹ ' + finalTotal);
+        }
+
+        // ... Rest of your JavaScript code
+    });
+</script>
+
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<!-- Include Toastr JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<!-- Your existing script -->
+<script>
+    $(document).ready(function() {
+        $('#addAddressForm').submit(function(e) {
+            e.preventDefault();
+            
+            toastr.options = {
+            positionClass: 'toast-top-center', // Set the position to top-center
+            closeButton: true, // Enable close button
+            timeOut: 5000, // Set the timeout (ms)
+        };
+
+
+            $.ajax({
+                type: 'POST',
+                url: '{% url "store:add_addresss" %}',
+                data: $(this).serialize(),
+                success: function(response) {
+                    if (response.success) {
+                        // Use Toastr for success
+                        toastr.success(response.success);
+
+                        // Redirect to the specified URL
+                        if (response.redirect_url) {
+                            window.location.href = response.redirect_url;
+                        }
+                    } else if (response.error) {
+                        // Use Toastr for error
+                        toastr.error(response.error);
+                    }
+                },
+                error: function() {
+                    // Use Toastr for general error
+                    toastr.error('An error occurred during the AJAX request.');
+                }
+            });
+        });
+    });
+</script>
+
+
+    {% endblock %}

@@ -1,5 +1,6 @@
-{% extends 'part/base.html' %}
+<!-- verify_otp.html -->
 
+{% extends 'part/base.html' %}
 {% block content %}
     <div class="container mt-15 mb-15">
         <div class="row justify-content-center">
@@ -17,6 +18,13 @@
                                 <button type="submit" class="btn btn-primary">Verify OTP</button>
                             </div>
                         </form>
+                        <!-- Resend OTP Form -->
+                        <div class="text-center mt-3">
+                            <form action="{% url 'accounts:resend_otp' %}" method="POST">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-secondary">Resend OTP</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

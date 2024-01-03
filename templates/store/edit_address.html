@@ -1,0 +1,62 @@
+{% extends 'part/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+        
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Edit Address</h5>
+                    <form method="POST" action="{% url 'store:edit_address' address.id %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="first_name">First Name</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" value="{{address.first_name}}" required maxlength="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="last_name">Last Name</label>
+                            <input type="text" class="form-control" id="last_name" value="{{address.last_name}}" name="last_name" required maxlength="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" class="form-control" id="email" value="{{address.email}}" name="email" required maxlength="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input type="tel" class="form-control" id="phone" value="{{address.phone}}" name="phone" required maxlength="10">
+                        </div>
+                        <div class="form-group">
+                            <label for="address_line_1">Address</label>
+                            <input type="text" class="form-control" id="address_line_1" value="{{address.address_line_1}}" name="address_line_1" required maxlength="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="address_line_1">Address</label>
+                            <input type="text" class="form-control" id="address_line_2" value="{{address.address_line_2}}" name="address_line_2" required maxlength="99">
+                        </div>
+                        <div class="form-group">
+                            <label for="address_line_1">Postalcode</label>
+                            <input type="text" class="form-control" id="postal_code" value="{{address.postal_code}}" name="postal_code" required maxlength="10">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="city">City</label>
+                                <input type="text" class="form-control" id="city" value="{{address.city}}" name="city" required maxlength="49">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="state">State</label>
+                                <input type="text" class="form-control" id="state"  value="{{address.state}}" name="state" required maxlength="49">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="country">Country</label>
+                            <input type="text" class="form-control" id="country"  value="{{address.country}}" name="country" required maxlength="49">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
