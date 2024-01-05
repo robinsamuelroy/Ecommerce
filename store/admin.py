@@ -1,7 +1,5 @@
 from django.contrib import admin
-from store.models import Category, Product, Brand, ProductVariant, Color, ProductImages, VariantImages, Cart, CartItem, Address, Coupon, Payment, Order, OrderProduct, Coupon, RedeemedCoupon, wallet
-# Register your models here.
-
+from store.models import *
 class ProductImagesAdmin(admin.TabularInline):
    model = ProductImages
 
@@ -52,6 +50,15 @@ class PaymentAdmin(admin.ModelAdmin):
 class WalletAdmin(admin.ModelAdmin):
    list_display = ['user', 'wallet_amount', 'wishlist']
 
+class BannerImageAdmin(admin.TabularInline):
+   model = BannerImage
+
+class BannerAdmin(admin.ModelAdmin):
+   inlines = [BannerImageAdmin]
+   list_display = ['banner_name', 'is_active', 'set']
+
+
+
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Cart, CartAdmin)
@@ -60,6 +67,7 @@ admin.site.register(ProductVariant,ProductVariantAdmin)
 admin.site.register(Color,ColorAdmin)
 admin.site.register(Brand,BrandAdmin)
 admin.site.register(Address, AddressAdmin)
+admin.site.register(Banner, BannerAdmin)
 
 admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderProduct, OrderProductAdmin)

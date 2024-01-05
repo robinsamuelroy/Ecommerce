@@ -1,5 +1,7 @@
 from collections import defaultdict
 import datetime
+from io import BytesIO
+import os
 from django.shortcuts import render,redirect,get_object_or_404
 from store.models import *
 from django.contrib.auth.decorators import login_required
@@ -16,6 +18,8 @@ from admin_panel.forms import CouponForm
 from admin_auth import views
 from django.db.models import Count, Sum
 from datetime import datetime
+from PIL import Image
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 
 # Create your views here.
@@ -34,6 +38,69 @@ from datetime import datetime
 #     }
   
 #   return render(request,'admin_panel/dashboard.html',context)
+
+from PIL import Image
+
+from django.core.files.uploadedfile import SimpleUploadedFile
+
+def resize_image(image, output_width=1200, output_height=400):
+    original_image = Image.open(image)
+    if original_image.mode == 'RGBA':
+        original_image = original_image.convert('RGB')
+
+    resized_image = original_image.resize((output_width, output_height), resample=Image.BICUBIC)
+
+    temp_directory = "path/to/temporary/"
+    os.makedirs(temp_directory, exist_ok=True)
+
+    temp_file_path = os.path.join(temp_directory, "resized_image.jpg")
+    resized_image.save(temp_file_path)
+
+    return temp_file_path
+
+def add_banners(request):
+    if request.method == 'POST':
+        banner_name = request.POST.get('banner_name')
+        images = request.FILES.getlist('images[]')
+
+        if not banner_name or not images:
+            messages.error(request, 'Provide Proper banner name and images')
+            return redirect('admin_panel:add_banner')  # Redirect back to the form page, or adjust the URL as needed
+        
+        else:
+            banner = Banner.objects.create(banner_name=banner_name)
+            for image in images:
+                resized_image_path = resize_image(image)
+                banner_image = BannerImage(banner=banner, images=SimpleUploadedFile("resized_image.jpg", open(resized_image_path, "rb").read()))
+                banner_image.save()
+
+                # Clean up temporary files
+                os.remove(resized_image_path)
+            
+            messages.success(request, 'Banner added successfully')
+            print('hai')
+            return redirect('admin_panel:display')  # Redirect to the desired page after successfully adding the banner
+
+    return render(request, 'admin_panel/add_banner.html')
+
+
+
+
+def display(request):
+    banners = Banner.objects.all()
+    return render(request, 'admin_panel/list_banner.html', {'banners': banners})
+
+  
+
+def delete_banner(request,banner_id):
+    banner=Banner.objects.get(pk=banner_id)
+    if banner.set==True:
+       messages.error(request,'This banner is set as default banner,Set another one')
+    else:
+        banner.delete()   
+    return redirect('admin_panel:display')
+
+#####################################################################################################
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -430,7 +497,7 @@ def admin_add_category(request):
             cat_data = Category(title=cat_title, image=request.FILES.get('category_image'))
             cat_data.save()
             messages.success(request, 'Category added successfully.')
-            return redirect('your_redirect_url_name')  # Replace 'your_redirect_url_name' with your desired URL
+            return redirect('admin_panel:admin_add_category')  # Replace 'your_redirect_url_name' with your desired URL
         
     return render(request, 'admin_panel/admin_add_category.html')
 

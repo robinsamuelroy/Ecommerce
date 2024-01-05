@@ -18,6 +18,7 @@
                         <th>Order ID</th>
                         <th>Ordered products</th>
                         <th>Order Total</th>
+                        <th>Order Status</th>
                         
                         <!-- Add other order-related columns as needed -->
                     </tr>
@@ -28,6 +29,7 @@
                         <td>{{ order.order_number }}</td>
                         <td><a href="{% url 'admin_panel:ordered_product_details' order_id=order.id %}">View Details</a></td>
                         <td>${{ order.order_total }}</td>
+                        <td>{{ order.status }}</td>
                         <!-- Add other order-related data as needed -->
                     </tr>
                     {% endfor %}

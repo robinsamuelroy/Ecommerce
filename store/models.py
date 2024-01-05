@@ -242,6 +242,7 @@ class orderAddress(models.Model):
 
     
 class Order(models.Model):
+    
     STATUS =(
         ('New','New'),
         ('Accepted','Accepted'),
@@ -286,13 +287,24 @@ class OrderProduct(models.Model):
     
 ###########################################################################################################
     
+
+
+
 class wallet(models.Model):
     user=models.ForeignKey(Account, on_delete=models.CASCADE)
     wallet_amount=models.FloatField(default=100)
     created_on=models.DateField(auto_now=True)
 
+
     def __str__(self):
         return(self.user.username,self.wallet_amount)
+    
+class WalletTransaction(models.Model):
+    user=models.ForeignKey(Account, on_delete=models.CASCADE)
+    Wallet=models.ForeignKey(wallet, on_delete=models.CASCADE)
+    status=models.CharField(max_length=10, null=True)
+    amount=models.FloatField(default=100)
+    created_at=models.DateTimeField(auto_now_add=True)
 
 
 class WishList(models.Model):
@@ -330,20 +342,19 @@ class RedeemedCoupon(models.Model):
 
     def __str__(self):
         return f"{self.coupon.code} redeemed by {self.user.username} on {self.redeemed_date}"
+    
+class Banner(models.Model):
+    banner_name = models.CharField(max_length=50, blank=True)
+ 
+    is_active = models.BooleanField(default=True)
+    set=models.BooleanField(default=False)
 
-
-
-
-
-
-   
-
-
-
-
-
-
-
-
-
-
+    def __str__(self):
+        return self.banner_name
+    
+class BannerImage(models.Model):
+    banner=models.ForeignKey(Banner,on_delete=models.CASCADE,related_name='images')  
+    images = models.ImageField(upload_to='banneer_images/', blank=True) 
+    
+    def __str__(self):
+        return self.banner.banner_name

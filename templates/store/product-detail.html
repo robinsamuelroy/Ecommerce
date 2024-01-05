@@ -66,17 +66,28 @@
                                                
                                         {% for variant in selected_variants %}
                                         <div class="product-price primary-color float-left">
+                                            {% if variant.price != variant.old_price %}
                                             <ins><span class="text-brand">₹ {{variant.price}}</span></ins>
                                             <ins><span class="old-price font-md ml-15">₹ {{variant.old_price}}</span></ins>
+                                            {% else %}
+                                                <ins><span class="text-brand">₹ {{variant.price}}</span></ins>
+                                                {% endif %}
+                                            </span>
                                             <span class="save-price  font-md color3 ml-15">25% Off</span>
                                         </div>
                                         {% endfor %}
                                   
                                         {%else%}
                                         <div class="product-price primary-color float-left">
+                                            {% if product.variant.first.price != product.variant.first.old_price %}
                                             <ins><span class="text-brand">₹ {{product.variant.first.price}}</span></ins>
                                             <ins><span class="old-price font-md ml-15">₹ {{product.variant.first.old_price}}</span></ins>
+                                            {% else %}
+                                                    <ins><span class="text-brand">₹ {{product.variant.first.price}}</span></ins>
+                                                {% endif %}
+                                            </span>
                                             <span class="save-price  font-md color3 ml-15">25% Off</span>
+                        
                                         </div>
                                         {% endif %}
                                     </div>
@@ -133,7 +144,7 @@
                                         style="margin-left: -70px;" type="submit">Add To Cart</button>
                                 </form>
                                 <div class="wishlist-compare" style="margin-top: 10px;">
-                                    <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
+                                    <a aria-label="Add To Wishlist" class="action-btn hover-up" href="{% url 'store:wishlist' %}"><i class="fi-rs-heart"></i></a>
                                     <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
                                 </div>
                             </div>

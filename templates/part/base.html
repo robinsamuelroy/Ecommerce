@@ -179,7 +179,7 @@
                                   </div>
                                   <div class="product-extra-link2">
                                       <button type="submit" class="button button-add-to-cart">Add to cart</button>
-                                      <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
+                                      <a aria-label="Add To Wishlist" class="action-btn hover-up" href="{% url 'store:wishlist' %}"><i class="fi-rs-heart"></i></a>
                                       <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
                                   </div>
                               </div>
@@ -225,9 +225,9 @@
                           <li>
                               <a class="language-dropdown-active" href="#"> <i class="fi-rs-world"></i> English <i class="fi-rs-angle-small-down"></i></a>
                               <ul class="language-dropdown">
-                                  <li><a href="#"><img src="{% static 'assets/imgs/theme/flag-fr.png' %}" alt="">Français</a></li>
-                                  <li><a href="#"><img src="{% static 'assets/imgs/theme/flag-dt.png' %}" alt="">Deutsch</a></li>
-                                  <li><a href="#"><img src="{% static 'assets/imgs/theme/flag-ru.png' %}" alt="">Pусский</a></li>
+                                  <li><a href="#"><img src="{% static 'assets/imgs/theme/flag-fr.png' %}" alt="">Arabic</a></li>
+                                  <li><a href="#"><img src="{% static 'assets/imgs/theme/flag-dt.png' %}" alt="">French</a></li>
+                                  <li><a href="#"><img src="{% static 'assets/imgs/theme/flag-ru.png' %}" alt="">German</a></li>
                               </ul>
                           </li>
                           
@@ -254,20 +254,13 @@
               </div>
               <div class="header-right">
                   <div class="search-style-2">
-                      {% comment %} <form action="{%url 'app1:search' %}" method="get"> {% endcomment %}
+                      <form action="{%url 'store:search' %}" method="get">
                         
                           <select class="select-active">
                               <option>All Categories</option>
-                              <option>men's</option>
-                              <option>Men's</option>
-                              <option>Cellphones</option>
-                              <option>Computer</option>
-                              <option>Electronics</option>
-                              <option> Accessories</option>
-                              <option>Home & Garden</option>
-                              <option>Luggage</option>
-                              <option>Shoes</option>
-                              <option>Mother & Kids</option>
+                              <option>men's watches</option>
+                              <option>women's watches</option>
+                              <option>unisex watches</option>
                           </select>
                           <input type="text" placeholder="Search for items..." name="q">
                           <button class="fas fa-search"></button>
@@ -278,13 +271,13 @@
                           <div class="header-action-icon-2">
                               <a href="{% url 'store:wishlist' %}">
                                   <img class="svgInject" alt="Evara" src="{%static 'assets/imgs/theme/icons/icon-heart.svg'%}">
-                                  <span class="pro-count blue "></span>
+                                  {% comment %} <span class="pro-count blue "></span> {% endcomment %}
                               </a>
                           </div>
                           <div class="header-action-icon-2">
                             <a class="mini-cart-icon" href="{% url 'store:shopping_cart'  %}">
                                 <img alt="Evara" src="{% static 'assets/imgs/theme/icons/icon-cart.svg' %}" style="width: 40px; height: 40px;">
-                                <span class="pro-count blue cart-items-count">{{ request.session.cart_data_obj|length }}</span>
+                                {% comment %} <span class="pro-count blue cart-items-count">{{ request.session.cart_data_obj|length }}</span> {% endcomment %}
                             </a>
                             
                               <div class="cart-dropdown-wrap cart-dropdown-hm2">
@@ -310,10 +303,9 @@
                                 </ul>
                                 {% endfor %}
                                   <div class="shopping-cart-footer">
-                                      
                                       <div class="shopping-cart-button">
-                                          {% comment %} <a href="{% url 'app1:cart'  %}" class="outline">View cart</a> {% endcomment %}
-                                          {% comment %} <a href="{% url 'app1:checkout' %}">Checkout</a> {% endcomment %}
+                                          <a href="{% url 'store:shopping_cart'  %}" class="outline">View cart</a>
+                                          <a href="{% url 'store:checkout' %}">Checkout</a>
                                       </div>
                                   </div>
                               </div>
@@ -374,31 +366,31 @@
                               
                               <li><a href="#">Pages <i class="fi-rs-angle-down"></i></a>
                                   <ul class="sub-menu">
-                                      <li><a href="page-about.html">About Us</a></li>
-                                      <li><a href="page-contact.html">Contact</a></li>
+                                      <li><a href="{% url 'store:about' %}">About Us</a></li>
+                                      <li><a href="{% url 'store:contact' %}">Contact</a></li>
                                       <li><a href="{% url 'store:user_dashboard'  %}">My Account</a></li>
-                                      <li><a href="page-login-register.html">login/register</a></li>
-                                      <li><a href="page-purchase-guide.html">Purchase Guide</a></li>
-                                      <li><a href="page-privacy-policy.html">Privacy Policy</a></li>
-                                      <li><a href="page-terms.html">Terms of Service</a></li>
-                                      <li><a href="page-404.html">404 Page</a></li>
+                                      <li><a href="{% url 'accounts:signup'  %}">login/register</a></li>
+                                      <li><a href="{% url 'store:guide'  %}">Purchase Guide</a></li>
+                                      <li><a href="{% url 'store:policy' %}">Privacy Policy</a></li>
+                                      {% comment %} <li><a href="page-terms.html">Terms of Service</a></li> {% endcomment %}
+                                      {% comment %} <li><a href="page-404.html">404 Page</a></li> {% endcomment %}
                                   </ul>
                               </li>
                               <li>
-                                  <a href="page-contact.html">Contact</a>
+                                  <a href="{% url 'store:contact' %}">Contact</a>
                               </li>
                           </ul>
                       </nav>
                   </div>
               </div>
               <div class="hotline d-none d-lg-block">
-                  <p><i class="fi-rs-headset"></i><span>Hotline</span> 1900 - 888 </p>
+                  <p><i class="fi-rs-headset"></i><span>Hotline</span> 91 - 6238104725 </p>
               </div>
               <p class="mobile-promotion">Happy <span class="text-brand">Mother's Day</span>. Big Sale Up to 40%</p>
               <div class="header-action-right d-block d-lg-none">
                   <div class="header-action-2">
                       <div class="header-action-icon-2">
-                          <a href="shop-wishlist.html">
+                          <a href=""{% url 'store:wishlist' %}"">
                               <img alt="Evara" src="{% static 'assets/imgs/theme/icons/icon-heart.svg' %}">
                               <span class="pro-count white"></span>
                           </a>

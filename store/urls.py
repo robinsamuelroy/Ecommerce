@@ -6,6 +6,10 @@ app_name = 'store'
 
 urlpatterns = [
      path('', views.home, name ='home'),
+
+     path('search/',views.search_view,name='search'),
+     path('toggle_set/<int:banner_id>/',views.toggle_set,name='toggle_set'),
+
      path('products/', views.product_list, name = 'product-list'),
      path('product/<pid>/', views.product_detail, name = 'product-detail'),
      path('category/', views.category_list, name = 'category-list'),
@@ -52,6 +56,12 @@ urlpatterns = [
 
      path('wallet',views.wallet_details,name="wallet"),
      path('pay_wallet_details/<str:order_number>/<str:order_total>/', views.pay_wallet_details, name="pay_wallet_details"),
+
+
+     path('about/', views.about_view, name='about'),
+     path('contact/', views.contact_view, name='contact'),
+     path('guide/', views.guide_view, name='guide'),
+     path('policy/', views.policy_view, name='policy'),
 
            
 ]

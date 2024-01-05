@@ -1,4 +1,5 @@
 import datetime
+import os
 import re
 from django.shortcuts import redirect, render
 from django.db.models import Count
@@ -16,6 +17,9 @@ from django.db import transaction
 from django.contrib import auth
 from django.views.decorators.cache import cache_control
 from django.db.models import F
+from django.core.files.uploadedfile import SimpleUploadedFile
+from PIL import Image
+
 
 #for profile validation
 
@@ -35,20 +39,62 @@ def is_not_empty_or_whitespace(value):
 
 #home, shop, product detail,  view
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def home(request):
-    blocked_categories =Category.objects.filter(is_blocked =True)
-    products = Product.objects.filter(featured = True, status =True).exclude(category__in=blocked_categories)
-    latest = Product.objects.filter(status=True).order_by("-id")[:10]
-    categories =Category.objects.filter(is_blocked =False)
-    print(categories)
-   
-    context = {
-        "products":products,
-        "latest":latest,
-        "categories":categories
-    }
-    return render(request, 'store/home.html',context)
 
+
+def home(request):
+    blocked_categories = Category.objects.filter(is_blocked=True)
+    products = Product.objects.filter(featured=True, status=True).exclude(category__in=blocked_categories)
+    latest = Product.objects.filter(status=True).order_by("-id")[:10]
+    categories = Category.objects.filter(is_blocked=False)
+    
+    try:
+        banner = Banner.objects.get(set=True)
+    except Banner.DoesNotExist:
+        # If no banner is set, set banner as None or any default value
+        banner = None
+    
+    context = {
+        'banner': banner,
+        'products': products,
+        'latest': latest,
+        'categories': categories
+    }
+    return render(request, 'store/home.html', context)
+
+
+#######################################################################################################
+
+
+from django.http import JsonResponse
+
+def toggle_set(request, banner_id):
+    if request.method == 'POST':
+        banner = get_object_or_404(Banner, id=banner_id)
+        banner_name = banner.banner_name
+        original_set_value = banner.set
+
+        # If the banner is currently set, toggle it off
+        if original_set_value:
+            banner.set = False
+            banner.save()
+            message = f'{banner_name} is no longer the default Banner'
+        else:
+            # Update all banners to set 'set' attribute as False
+            Banner.objects.all().update(set=False)
+            # Set the selected banner as the default one
+            banner.set = True
+            banner.save()
+            message = f'{banner_name} is set as the default Banner'
+
+        messages.success(request, message)
+
+        return redirect('admin_panel:display')
+    else:
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+
+####################################################################################
 
 def product_list(request):
     blocked_categories =Category.objects.filter(is_blocked =True)
@@ -577,14 +623,27 @@ def place_order(request, total=0, quantity=0):
             
             data.save()
             
-            yr = int(datetime.date.today().strftime('%Y'))
-            dt = int(datetime.date.today().strftime('%d'))
-            mt = int(datetime.date.today().strftime('%m'))
-            d = datetime.date(yr, mt, dt)
+            # yr = int(datetime.date.today().strftime('%Y'))
+            # dt = int(datetime.date.today().strftime('%d'))
+            # mt = int(datetime.date.today().strftime('%m'))
+            # d = datetime.date(yr, mt, dt)
+            # current_date = d.strftime("%Y%m%d")
+            # order_number = current_date + str(data.id)
+            # data.order_number = order_number
+            # data.save()
+
+            from datetime import datetime
+
+            yr = datetime.now().year
+            dt = datetime.now().day
+            mt = datetime.now().month
+
+            d = datetime(yr, mt, dt)
             current_date = d.strftime("%Y%m%d")
             order_number = current_date + str(data.id)
             data.order_number = order_number
             data.save()
+  
 
             #Remove the coupon_discount from the session
             if 'coupon_discount' in request.session:
@@ -714,6 +773,35 @@ def paytment(request):
             order.payment = payment
             order.save()
             
+
+
+
+
+            new_address = orderAddress(
+                user=request.user,  # Replace 'username' with the field you use to identify users
+                address_type=order.selected_address.address_type, 
+                first_name=order.selected_address.first_name,
+                last_name=order.selected_address.last_name,
+                email=order.selected_address.email,
+                phone=order.selected_address.phone,
+                address_line_1=order.selected_address.address_line_1,
+                address_line_2=order.selected_address.address_line_2,
+                city=order.selected_address.city,
+                state=order.selected_address.state,
+                postal_code=order.selected_address.postal_code,
+                country=order.selected_address.country,
+                is_active=True
+            )
+
+            # Save the new address to the database
+            new_address.save()
+      
+            order.address = new_address
+            order.save()
+           
+
+
+            
             
 
             cp=request.session.get('coupon_code')
@@ -838,6 +926,18 @@ def return_order(request, order_id):
         wallets.wallet_amount += order.order_total
         wallets.wallet_amount = round(wallets.wallet_amount, 2)
         wallets.save()
+
+        transaction = WalletTransaction.objects.create(
+                        user=request.user,
+                        Wallet=wallets,
+                        status="Credited",
+                        amount=order.order_total,  # Replace with the actual amount
+                        created_at=datetime.now()  # Replace with the actual date/time
+                    )
+
+                    # Save the transaction to the database
+        transaction.save()
+
        
       
         order.status = 'Rejected'
@@ -873,6 +973,16 @@ def return_order(request, order_id):
         wallets.wallet_amount += order.order_total
         wallets.wallet_amount = round(wallets.wallet_amount, 2)
         wallets.save()
+        transaction = WalletTransaction.objects.create(
+                        user=request.user,
+                        Wallet=wallets,
+                        status="Credited",
+                        amount=order.order_total,  # Replace with the actual amount
+                        created_at=datetime.now()  # Replace with the actual date/time
+                    )
+
+                    # Save the transaction to the database
+        transaction.save()
        
         # Update the order status to 'Returned'
         order.status = 'Cancelled'
@@ -1244,18 +1354,8 @@ def wallet_details(request):
     wallet_amount = round(wallet_instance.wallet_amount, 2)
     user = request.user
 
-    # Fetch 'Debit' transactions related to wallet payments
-    wallet_transactions = user.payment_set.filter(
-        payment_method="Wallet Payment",  # Filter by wallet payments
-        status="Paid",                    # Filter only paid transactions
-        amount_paid__lt=0                 # Assuming 'Debit' amounts are negative
-    ).order_by('-created_at')            # Sort by date, descending order
-
-    # Fetch related products for each 'Debit' transaction
-    for transaction in wallet_transactions:
-        transaction.products_purchased = OrderProduct.objects.filter(
-            payment=transaction, user=request.user
-        ).values_list('product__name', flat=True)
+    # Fetch transactions related to the wallet
+    wallet_transactions = WalletTransaction.objects.filter(Wallet=wallet_instance)
 
     context = {
         'wallet_amount': wallet_amount,
@@ -1267,6 +1367,8 @@ def wallet_details(request):
 
 
 
+
+from datetime import datetime
 
 def pay_wallet_details(request, order_number, order_total):
     grand_total = order_total
@@ -1346,6 +1448,27 @@ def pay_wallet_details(request, order_number, order_total):
 
                 order.payment = payment
                 order.save()
+
+                new_address = orderAddress(
+                user=request.user,  # Replace 'username' with the field you use to identify users
+                address_type=order.selected_address.address_type, 
+                first_name=order.selected_address.first_name,
+                last_name=order.selected_address.last_name,
+                email=order.selected_address.email,
+                phone=order.selected_address.phone,
+                address_line_1=order.selected_address.address_line_1,
+                address_line_2=order.selected_address.address_line_2,
+                city=order.selected_address.city,
+                state=order.selected_address.state,
+                postal_code=order.selected_address.postal_code,
+                country=order.selected_address.country,
+                is_active=True
+            )
+
+            # Save the new address to the database
+                new_address.save()
+                order.address = new_address
+                order.save()
                 
                 
                 cp = request.session.get('coupon_code')
@@ -1380,4 +1503,47 @@ def pay_wallet_details(request, order_number, order_total):
                 cart_items.delete()    
                 wallets.wallet_amount -= float(grand_total)
                 wallets.save()
+                
+                transaction = WalletTransaction.objects.create(
+                        user=request.user,
+                        Wallet=wallets,
+                        status="Debited",
+                        amount=grand_total,  # Replace with the actual amount
+                        created_at=datetime.now()  # Replace with the actual date/time
+                    )
+
+                    # Save the transaction to the database
+                transaction.save()
+
+
                 return redirect("store:order_success", id=order.id)
+        
+        
+def search_view(request):
+    query =request.GET.get('q')
+    print(query)
+    
+    products =Product.objects.filter(title__icontains =query)
+    print(products)
+    
+    context ={
+        'products':products,
+        'query': query
+        
+    }
+    
+    return render(request,'store/search.html',context)
+
+#################################################################
+
+def about_view(request):
+    return render(request, 'store/page-about.html')
+
+def contact_view(request):
+    return render(request, 'store/page-contact.html')
+
+def guide_view(request):
+    return render(request, 'store/purchase-guide.html')
+
+def policy_view(request):
+    return render(request, 'store/privacy-policy.html')

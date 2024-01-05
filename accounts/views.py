@@ -202,7 +202,7 @@ def resend_otp(request):
 
 ##############################################################################################################################
 
-@transaction.atomic
+# @transaction.atomic
 def confirm_razorpay_payment(request, order_number):
     
     current_user = request.user
@@ -224,7 +224,31 @@ def confirm_razorpay_payment(request, order_number):
     print("razorpay")
 
     order.payment = payment
-    order.save() 
+    order.save()
+    new_address = orderAddress(
+                user=request.user,  # Replace 'username' with the field you use to identify users
+                address_type=order.selected_address.address_type, 
+                first_name=order.selected_address.first_name,
+                last_name=order.selected_address.last_name,
+                email=order.selected_address.email,
+                phone=order.selected_address.phone,
+                address_line_1=order.selected_address.address_line_1,
+                address_line_2=order.selected_address.address_line_2,
+                city=order.selected_address.city,
+                state=order.selected_address.state,
+                postal_code=order.selected_address.postal_code,
+                country=order.selected_address.country,
+                is_active=True
+            )
+
+            # Save the new address to the database
+    new_address.save()
+      
+    order.address = new_address
+    order.save()
+
+
+
     cp=request.session.get('coupon_code')
     if cp is not None:
      ns=Coupon.objects.get(code=cp)

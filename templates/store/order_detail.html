@@ -68,12 +68,12 @@
                     <tbody class="table-border-bottom-0">
                       {% for order in orders %}
                         <tr>
-                            <td><strong>{{ order.selected_address.first_name }}</strong></td>
+                            <td><strong>{{ order.address.first_name }}</strong></td>
                             <td>
-                              <p>{{ order.selected_address.address_line_1 }}</p>
-                              <p>{{ order.selected_address.city }} - {{ order.selected_address.state }}</p>
+                              <p>{{ order.address.address_line_1 }}</p>
+                              <p>{{ order.address.city }} - {{ order.selected_address.state }}</p>
                             </td>
-                            <td>{{ order.selected_address.phone }}</td>
+                            <td>{{ order.address.phone }}</td>
                         </tr>
                       {% endfor %}
                     </tbody>

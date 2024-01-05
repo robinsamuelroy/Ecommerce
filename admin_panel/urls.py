@@ -5,11 +5,16 @@ from .import views
 
 app_name='admin_panel'
 urlpatterns = [
+  
     path('dashboard/', views.dashboard, name='dashboard'),
     path('chart/',views.charts,name='charts'),
     path('reports/',views.reports,name='reports'),
     path('sales-report/', views.sales_report, name='sales_report'),
     path('filtered_sales/', views.filtered_sales, name='filtered_sales'),
+
+    path('add_banner/', views.add_banners, name='add_banner'),
+    path('display/',views.display,name='display'),
+    path('delete_banner/<int:banner_id>',views.delete_banner,name='delete_banner'),
 
     path('admin_products_list',views.admin_products_list,name='admin_products_list'),
     path('admin_products_details/<str:pid>/',views.admin_products_details,name='admin_products_details'),

@@ -84,9 +84,11 @@
                                             </a>
                                         </div>
                                         <div class="product-action-1">
-                                            <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal" data-bs-target="#quickViewModal"><i class="fi-rs-eye"></i></a>
-                                            <a aria-label="Add To Wishlist" class="action-btn hover-up" href="{% url 'store:add_wishlist' p.pid %}"><i class="fi-rs-heart"></i></a>
-                                            <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
+                                            <a aria-label="Add To Wishlist" class="action-btn small hover-up" href="{% url 'store:add_wishlist' p.pid %}" tabindex="0"><i class="fi-rs-heart"></i></a>
+                                    {% comment %} <a aria-label="Compare" class="action-btn small hover-up" href="shop-compare.html" tabindex="0"><i class="fi-rs-shuffle"></i></a> {% endcomment %}
+                                    <a aria-label="View Options" class="action-btn small hover-up" href="{% url 'store:product-detail' p.pid %}" tabindex="0">
+                                        <i class="fi-rs-eye"></i> <!-- Replace 'fi-rs-eye' with the class of your view options icon -->
+                                    </a>
                                         </div>
                                         <div class="product-badges product-badges-position product-badges-mrg">
                                             <span class="hot">

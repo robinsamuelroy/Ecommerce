@@ -1,0 +1,131 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+{% block body %}
+
+<style>
+    /* Custom styles */
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .form-container {
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-top: 50px;
+    }
+
+    label {
+        margin-bottom: 0.5rem;
+    }
+
+    #imagePreview {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+
+    #imagePreview img {
+        max-width: 300px;
+        height: auto;
+        border-radius: 4px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    button {
+        background-color: #28a745;
+        color: #fff;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #218838;
+    }
+
+
+</style>
+<style>
+    #messages {
+        margin-top: 10px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        transition: background-color 0.3s; /* Smooth transition for background color changes */
+    }
+
+    .success-message {
+        background-color: #41a358; /* Light green background for success messages */
+        color: #155724; /* Dark green text color for success messages */
+    }
+
+    .error-message {
+        background-color: #82383e; /* Light red background for error messages */
+        color: #721c24; /* Dark red text color for error messages */
+    }
+</style>
+
+
+
+<h2>Create Banner</h2>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-12 form-container">
+            <div id="messages"></div>
+
+            <form method="post" enctype="multipart/form-data" action="{% url 'admin_panel:add_banner' %}" id="bannerForm">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="banner_name">Banner Name:</label>
+                    <input type="text" class="form-control" id="banner_name" name="banner_name" required maxlength="49">
+                </div>
+
+                <div class="form-group">
+                    <label for="id_images">Select Image(s):</label>
+                    <input type="file" class="form-control" id="id_images" name="images[]" accept="image/*" multiple>
+                </div>
+
+                <div id="imagePreview"></div>
+              
+                <button type="submit" class="btn btn-success" >ADD</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('id_images').addEventListener('change', function (event) {
+        var imagePreviewDiv = document.getElementById('imagePreview');
+        imagePreviewDiv.innerHTML = '';
+
+        var files = event.target.files;
+        for (var i = 0; i < files.length; i++) {
+            var file = files[i];
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                var img = document.createElement('img');
+                img.src = e.target.result;
+                imagePreviewDiv.appendChild(img);
+            };
+
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}

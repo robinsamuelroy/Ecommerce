@@ -76,6 +76,7 @@
                     <div class="submenu">
                        
                         <a href="{% url 'admin_panel:admin_category_list' %}">Category list</a>
+                        <a href="{% url 'admin_panel:admin_add_category' %}">Add Category</a>
                     </div>
                 </li>
 
@@ -130,6 +131,19 @@
                 </li>
 
 
+                {% comment %} need to add later {% endcomment %}
+                {% comment %} <li class="menu-item has-submenu">
+                    <a class="menu-link" href="page-orders-1.html"> <i class="icon material-icons md-local_offer"></i>
+                        <span class="text">Banner</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="{% url 'admin_panel:add_banner' %}">Add Banner</a>
+                        <a href="{% url 'admin_panel:display' %}">Banner List</a>
+                        
+                    </div>
+                </li>
+
+
 
 
 
@@ -152,7 +166,7 @@
                     <a class="menu-link"  href="#"> <i class="icon material-icons md-pie_chart"></i>
                         <span class="text">Coupon</span>
                     </a>
-                </li>
+                </li> {% endcomment %}
             </ul>
             <hr>
             <ul class="menu-aside">
