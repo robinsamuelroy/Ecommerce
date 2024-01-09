@@ -22,27 +22,31 @@
                                 <div class="detail-gallery">
                                     <span class="zoom-icon"><i class="fi-rs-search"></i></span>
                                     <!-- MAIN SLIDES -->
-
                                     <div class="product-image-slider">
-                                        <figure class="border-radius-10">
-                                            <img src="{{product.image.url}}" alt="product image">
-                                        </figure>
-                                        {% for p in p_image %}
-                                        <figure class="border-radius-10">
-                                            <img src="{{p.images.url}}" alt="product image">
-                                        </figure>
+                                        {% for variant in selected_variants %}
+                                            <figure class="border-radius-10">
+                                                <img src="{{ variant.image.url }}" alt="product image">
+                                            </figure>
+                                            {% for v_image in selected_variant_images %}
+                                                <figure class="border-radius-10">
+                                                    <img src="{{ v_image.images.url }}" alt="variant image">
+                                                </figure>
+                                            {% endfor %}
                                         {% endfor %}
-                                        
                                     </div>
                                     <!-- THUMBNAILS -->
                                     <div class="slider-nav-thumbnails pl-15 pr-15">
-                                        <div><img src="{{product.image.url}}" alt="product image"></div>
-                                        {% for p in p_image %}
-                                        <div><img src="{{p.images.url}}" alt="product image"></div>
+                                        {% for variant in selected_variants %}
+                                            <div><img src="{{ variant.image.url }}" alt="product image"></div>
+                                            {% for v_image in selected_variant_images %}
+                                                <div><img src="{{ v_image.images.url }}" alt="variant image"></div>
+                                            {% endfor %}
                                         {% endfor %}
                                     </div>
-                                   
                                 </div>
+                                
+                                
+                                
                                 <!-- End Gallery -->
                             </div>
                             <div class="col-md-6 col-sm-12 col-xs-12">

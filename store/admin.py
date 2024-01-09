@@ -20,6 +20,7 @@ class CartItemAdmin(admin.ModelAdmin):
   list_display = ['user','product','cart','quantity','is_active', 'variations']
 
 class ProductVariantAdmin(admin.ModelAdmin):
+    inlines = [VariantImagesAdmin]
     list_display = ['product', 'color', 'stock_count' ,'price','old_price','image']
 
 class ColorAdmin(admin.ModelAdmin):

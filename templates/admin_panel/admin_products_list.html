@@ -53,8 +53,8 @@
                                         <th>Product</th>
                                         <th>Category</th>
                                         <th>Status</th>
-                                        <th>Sale Price</th>                                    
-                                        <th class="text-end">Stock Quantity</th>
+                                        {% comment %} <th>Sale Price</th>                                     {% endcomment %}
+                                        {% comment %} <th class="text-end">Stock Quantity</th> {% endcomment %}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -74,11 +74,11 @@
                                         <td><a href="{% url 'admin_panel:admin_products_details' product.pid %}"> <h6 class="mb-0">{{ product.title}}</h6></a></td>
                                         <td><a href="#"> <h6 class="mb-0">{{ product.category}}</h6></a></td>
                                         <td><a href="#"> <h6 class="mb-0">{% if product.status %} <span style="color: rgb(143, 143, 39);">Active</span>  {% else %} <span style="color: rgb(120, 40, 40);">Blocked</span> {%endif %}</h6></a></td>
-                                        <td>{{ product.price }}</td>
-                                        <td class="text-end">
+                                        {% comment %} <td>{{ product.price }}</td> {% endcomment %}
+                                        {% comment %} <td class="text-end">
                                             <span class="badge rounded-pill {% if product.stock_count != '0' %} alert-success {% else %} alert-danger {% endif %}">
                                                 {% if product.stock_count == '0' %} Out of Stock  {% else %}{{product.stock_count}}  {% endif %} </span>
-                                        </td>
+                                        </td> {% endcomment %}
                                     </tr>
                                     {% endfor %}
                                 </tbody>

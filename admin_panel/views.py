@@ -377,9 +377,9 @@ def add_product(request):
         validation_errors = []
 
         try:
-            product_stock_count = int(product_stock_count)
-            if product_stock_count < 0:
-                validation_errors.append("Stock Count must be a non-negative integer.")
+            # product_stock_count = int(product_stock_count)
+            # if product_stock_count < 0:
+            #     validation_errors.append("Stock Count must be a non-negative integer.")
 
             max_price = float(max_price)
             if max_price < 0:
@@ -466,25 +466,6 @@ def admin_category_list(request):
     
     return render(request,'admin_panel/admin_category_list.html',context)
 
-# def admin_add_category(request):
-#     if request.method == 'POST':
-#         cat_title = request.POST.get('category_name')
-#         if Category.objects.filter(title=cat_title).exists():
-#             messages.error(request, 'Category with this title already exists.')
-#         else:
-#             cat_data = Category(title=cat_title, image=request.FILES.get('category_image'))
-#             cat_data.save()
-#             messages.success(request, 'Category added successfully.')
-        
-        
-#         cat_data = Category(title=cat_title,
-#                             image=request.FILES.get('category_image'))
-    
-    #     # cat_data.save()
-    # else:
-    #     return render(request, 'admin_panel/admin_add_category.html')
-    
-    # return render(request, 'admin_panel/admin_category_list.html')
 
 
 
@@ -576,19 +557,52 @@ def variant_list(request):
         }
     return render(request, 'admin_panel/listvariants.html', context)
 
+
+
+# def add_variant(request):
+#     if request.method == "POST":
+#         variant_form = ProductVariantForm(request.POST,request.FILES)
+#         if variant_form.is_valid():
+#             variant_form.save()
+#             return redirect("admin_panel:variant-list")
+#     else:
+#         variant_form = ProductVariantForm()
+#     context = {
+#         'variant_form': variant_form
+#         }
+      
+#     return render(request, 'admin_panel/addvariants.html', context)
+
+
 def add_variant(request):
-    if request.method == "POST":
-        variant_form = ProductVariantForm(request.POST,request.FILES)
+    additional_image_count = 3  # Define the count of additional images here
+
+    if request.method == 'POST':
+        variant_form = ProductVariantForm(request.POST, request.FILES)
         if variant_form.is_valid():
-            variant_form.save()
-            return redirect("admin_panel:variant-list")
+            variant_instance = variant_form.save(commit=False)
+            variant_instance.save()
+
+            # Handling additional images
+            for i in range(1, additional_image_count + 1):
+                image_field_name = f'additional_image_{i}'
+                image = request.FILES.get(image_field_name)
+                if image:
+                    VariantImages.objects.create(productvariant=variant_instance, images=image)
+
+            return redirect('admin_panel:variant-list')  # Adjust the redirect URL as needed
     else:
         variant_form = ProductVariantForm()
+
     context = {
-        'variant_form': variant_form
-        }
-      
+        'variant_form': variant_form,
+        'additional_image_count': range(1, additional_image_count + 1),
+    }
+
     return render(request, 'admin_panel/addvariants.html', context)
+
+
+
 
 def edit_variant(request, id):
     product = get_object_or_404(ProductVariant, pk=id)

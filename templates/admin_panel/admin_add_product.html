@@ -43,11 +43,11 @@
                                 </div>
                             </div>
                             <div class="col-lg-6">
-                                <div class="mb-4">
+                                {% comment %} <div class="mb-4">
                                     <label for="{{form.stock_count.id_for_label}}" class="form-label">Stock Count </label>
                                     <input placeholder="Stock Count" type="text" class="form-control" name="stock_count" required="True" min="0" value="{{ form_data.stock_count }}">
                                     
-                                </div>
+                                </div> {% endcomment %}
                             </div>
                         </div>
                         <div class="mb-4">
@@ -68,7 +68,7 @@
                             <div class="col-lg-6">
                                 <div class="mb-4">
                                     <label for="{{form.price.id_for_label}}" class="form-label">price</label>
-                                    <input placeholder="$" type="text" class="form-control" name="price" required="True" min="0" value="{{ form_data.price }}">
+                                    <input placeholder="₹" type="text" class="form-control" name="price" required="True" min="0" value="{{ form_data.price }}">
                                 </div>
                             </div>
                         </div>   

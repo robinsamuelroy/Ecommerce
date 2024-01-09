@@ -161,10 +161,13 @@ class VariantImages(models.Model):
     def Variant_image(self):
         return mark_safe("<img src='%s' width ='50' height='50' />" % (self.images.url))
 
+    # def __str__(self):
+    #     return str(self.product)
     def __str__(self):
-        return str(self.product) 
+        return f"Variant Image: {self.pk}"  # Changed the __str__ method to display image ID or any other identifier
 
-##################cart, order, orderitems and Address######################################
+
+#################cart, order, orderitems and Address######################################
 
     
 class Cart(models.Model):

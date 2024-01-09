@@ -65,7 +65,7 @@ def  otp_verification(request):
         return render(request,'accounts/otp.html')
     
 
-@never_cache
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def login_view(request):
   
     if request.user.is_authenticated:

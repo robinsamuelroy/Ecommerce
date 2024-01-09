@@ -38,23 +38,15 @@ def is_not_empty_or_whitespace(value):
     return bool(value.strip())
 
 #home, shop, product detail,  view
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-
-
 def home(request):
     blocked_categories = Category.objects.filter(is_blocked=True)
     products = Product.objects.filter(featured=True, status=True).exclude(category__in=blocked_categories)
     latest = Product.objects.filter(status=True).order_by("-id")[:10]
     categories = Category.objects.filter(is_blocked=False)
     
-    try:
-        banner = Banner.objects.get(set=True)
-    except Banner.DoesNotExist:
-        # If no banner is set, set banner as None or any default value
-        banner = None
-    
     context = {
-        'banner': banner,
         'products': products,
         'latest': latest,
         'categories': categories
@@ -62,39 +54,7 @@ def home(request):
     return render(request, 'store/home.html', context)
 
 
-#######################################################################################################
 
-
-from django.http import JsonResponse
-
-def toggle_set(request, banner_id):
-    if request.method == 'POST':
-        banner = get_object_or_404(Banner, id=banner_id)
-        banner_name = banner.banner_name
-        original_set_value = banner.set
-
-        # If the banner is currently set, toggle it off
-        if original_set_value:
-            banner.set = False
-            banner.save()
-            message = f'{banner_name} is no longer the default Banner'
-        else:
-            # Update all banners to set 'set' attribute as False
-            Banner.objects.all().update(set=False)
-            # Set the selected banner as the default one
-            banner.set = True
-            banner.save()
-            message = f'{banner_name} is set as the default Banner'
-
-        messages.success(request, message)
-
-        return redirect('admin_panel:display')
-    else:
-        return JsonResponse({'error': 'Method not allowed'}, status=405)
-
-
-
-####################################################################################
 
 def product_list(request):
     blocked_categories =Category.objects.filter(is_blocked =True)
@@ -157,35 +117,44 @@ def category_product_list(request, cid):
 
 
 def product_detail(request, pid):
- try:
-    product = Product.objects.get(pid=pid)
-    p_image = product.p_images.all()
-    variant = ProductVariant.objects.filter(product=product)
-    distinct_colors = variant.values_list('color__name', flat=True).distinct()
-    print(distinct_colors)
+    try:
+        product = Product.objects.get(pid=pid)
+        p_images = product.p_images.all()
+        variants = ProductVariant.objects.filter(product=product)
+        distinct_colors = variants.values_list('color__name', flat=True).distinct()
 
-    selected_color = request.GET.get('selected_color', None)
-    selected_variants = None
-    if selected_color:
-     sel=Color.objects.get(name=selected_color)
-    print(selected_color)
-    if selected_color:
-        selected_variants = ProductVariant.objects.filter(product=product, color=sel)
-    
-        print(selected_color)
+        selected_color = request.GET.get('selected_color')
+        selected_variants = None
+        selected_variant_images = None
 
- except Product.DoesNotExist:
+        # Defaulting to the first available variant or color if none is selected
+        if not selected_color:
+            default_variant = variants.first()
+            if default_variant:
+                selected_color = default_variant.color.name
+                selected_variants = variants.filter(color__name=selected_color)
+                selected_variant_images = default_variant.v_images.all()
+        else:
+            sel_color = Color.objects.get(name=selected_color)
+            selected_variants = variants.filter(color=sel_color)
+
+            if selected_variants.exists():
+                selected_variant = selected_variants.first()
+                selected_variant_images = selected_variant.v_images.all()
+
+    except Product.DoesNotExist:
         return HttpResponse("Product not found", status=404)
 
- context = {
-        "product" : product,
-        "p_image" : p_image,
-         "distinct_colors": distinct_colors,
-        "variant" : variant,
-        'selected_color': selected_color,
-        'selected_variants': selected_variants,
+    context = {
+        "product": product,
+        "p_images": p_images,
+        "distinct_colors": distinct_colors,
+        "variants": variants,
+        "selected_color": selected_color,
+        "selected_variants": selected_variants,
+        "selected_variant_images": selected_variant_images,
     }
- return render(request, 'store/product-detail.html', context)
+    return render(request, 'store/product-detail.html', context)
 
 ###################################################################################
 
@@ -899,6 +868,25 @@ def cancel_order_product(request, order_id):
     if order.status != 'Cancelled':
         order.status = 'Cancelled'
         order.save()
+
+
+        user_profile = request.user
+        wallets,create = wallet.objects.get_or_create(user=user_profile)
+        wallets.wallet_amount += order.order_total
+        wallets.wallet_amount = round(wallets.wallet_amount, 2)
+        wallets.save()
+        transaction = WalletTransaction.objects.create(
+                        user=request.user,
+                        Wallet=wallets,
+                        status="Credited",
+                        amount=order.order_total,  # Replace with the actual amount
+                        created_at=datetime.now()  # Replace with the actual date/time
+                    )
+
+                    # Save the transaction to the database
+        transaction.save()
+
+
         print("CHECK")
         order_products = OrderProduct.objects.filter(order=order)
         for order_product in order_products:
@@ -1344,7 +1332,6 @@ from .models import wallet  # Import models as needed
 from django.contrib.auth.decorators import login_required
 from django.db.models import Case, When, Value, CharField
 
-@login_required
 def wallet_details(request):
     try:
         wallet_instance = wallet.objects.get(user=request.user)
