@@ -21,6 +21,10 @@ from datetime import datetime
 from PIL import Image
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
+from django.http import JsonResponse
+from django.http import HttpResponse
+from store.models import *
+
 
 # Create your views here.
 # @login_required(login_url='admin_auth:admin_login')
@@ -574,6 +578,36 @@ def variant_list(request):
 #     return render(request, 'admin_panel/addvariants.html', context)
 
 
+# def add_variant(request):
+#     additional_image_count = 3  # Define the count of additional images here
+
+#     if request.method == 'POST':
+#         variant_form = ProductVariantForm(request.POST, request.FILES)
+#         if variant_form.is_valid():
+#             variant_instance = variant_form.save(commit=False)
+#             variant_instance.save()
+
+#             # Handling additional images
+#             for i in range(1, additional_image_count + 1):
+#                 image_field_name = f'additional_image_{i}'
+#                 image = request.FILES.get(image_field_name)
+#                 if image:
+#                     VariantImages.objects.create(productvariant=variant_instance, images=image)
+
+#             return redirect('admin_panel:variant-list')  # Adjust the redirect URL as needed
+#     else:
+#         variant_form = ProductVariantForm()
+
+#     context = {
+#         'variant_form': variant_form,
+#         'additional_image_count': range(1, additional_image_count + 1),
+#     }
+
+#     return render(request, 'admin_panel/addvariants.html', context)
+
+# views.py
+
+
 def add_variant(request):
     additional_image_count = 3  # Define the count of additional images here
 
@@ -600,6 +634,7 @@ def add_variant(request):
     }
 
     return render(request, 'admin_panel/addvariants.html', context)
+
 
 
 

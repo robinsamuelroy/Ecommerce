@@ -34,13 +34,14 @@ ALLOWED_HOSTS = ["*"]
 INSTALLED_APPS = [
     'store',
     'accounts',
+    'admin_panel',
+    'admin_auth',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'easy_pdf',
 ]
 
 MIDDLEWARE = [

@@ -2,7 +2,6 @@ from django import forms
 from store.models import *
 from django.core.exceptions import ValidationError
 from decimal import Decimal
-from store.models import ProductImages
 
 class CreateProductForm(forms.ModelForm):
     new_image = forms.ImageField(required=False)  # Add this line for the new image field

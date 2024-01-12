@@ -147,8 +147,6 @@ class ProductVariant(models.Model):
     def get_percentage(self):
       new_price = (self.price / self.old_price) * 100
       return new_price
-    
-###########################################################################################################
    
 class VariantImages(models.Model):
     images = models.ImageField(upload_to='variant_images',default='variant.jpg')
